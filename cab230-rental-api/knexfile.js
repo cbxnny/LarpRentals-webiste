@@ -5,9 +5,15 @@
 module.exports = {
 
   development: {
-    client: 'sqlite3',
+    client: 'mysql2',
     connection: {
-      filename: './dev.sqlite3'
+      host: '127.0.0.1',
+      user: 'root',
+      password: '',
+      database: 'rentals'
+    },
+    migrations: {
+      directory: './migrations'
     }
   },
 
