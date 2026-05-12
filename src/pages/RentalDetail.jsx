@@ -4,7 +4,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Map, Marker } from 'pigeon-maps';
 import {
   FaStar, FaRegStar, FaArrowLeft, FaBed, FaBath, FaCar,
-  FaMapMarkerAlt, FaHome, FaBuilding, FaShareAlt, FaCheckCircle
+  FaMapMarkerAlt, FaHome, FaBuilding, FaShareAlt, FaCheckCircle,
+  FaUserCircle, FaCommentAlt
 } from 'react-icons/fa';
 import { getRental, getRating, postRating, searchRentals } from '../api/rentals';
 import { useAuth } from '../context/AuthContext';
@@ -51,6 +52,56 @@ function StatBox({ icon, value, label, color }) {
   );
 }
 
+// NEW: Renders the reviews list from the A3 API reviews[] field
+function ReviewsList({ reviews }) {
+  if (!reviews || reviews.length === 0) return (
+    <p className="text-muted small mb-0 fst-italic">No written reviews yet.</p>
+  );
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '—';
+    try {
+      return new Intl.DateTimeFormat('en-AU', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(dateStr));
+    } catch { return dateStr; }
+  };
+
+  return (
+    <div className="d-flex flex-column gap-3">
+      {reviews.map((review, i) => (
+        <div key={i} style={{ background: '#f8fafc', borderRadius: 10, padding: '12px 14px', border: '1px solid #e2e8f0' }}>
+          <div className="d-flex justify-content-between align-items-start mb-2">
+            <div className="d-flex align-items-center gap-2">
+              <FaUserCircle size={18} className="text-muted" />
+              <span className="fw-semibold" style={{ fontSize: '0.82rem', color: '#334155' }}>
+                {review.user ?? 'Anonymous'}
+              </span>
+            </div>
+            <div className="d-flex align-items-center gap-1">
+              {[1, 2, 3, 4, 5].map(n => (
+                <FaStar key={n} size={12} color={n <= review.rating ? '#fbbf24' : '#e2e8f0'} />
+              ))}
+              <span className="ms-1 fw-semibold" style={{ fontSize: '0.78rem', color: '#64748b' }}>
+                {review.rating}/5
+              </span>
+            </div>
+          </div>
+          {review.comment && (
+            <div className="d-flex gap-2">
+              <FaCommentAlt size={12} className="text-muted mt-1 flex-shrink-0" />
+              <p className="mb-1" style={{ fontSize: '0.85rem', color: '#475569', lineHeight: 1.6 }}>
+                {review.comment}
+              </p>
+            </div>
+          )}
+          <div className="text-muted" style={{ fontSize: '0.73rem', marginTop: 4 }}>
+            {formatDate(review.dateTime)}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function RentalDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -65,6 +116,7 @@ export default function RentalDetail() {
   const [ratingSuccess, setRatingSuccess] = useState('');
   const [ratingError, setRatingError] = useState('');
   const [pendingRating, setPendingRating] = useState(0);
+  const [comment, setComment] = useState('');
 
   const [nearbyProperties, setNearbyProperties] = useState([]);
   const [copied, setCopied] = useState(false);
@@ -75,7 +127,6 @@ export default function RentalDetail() {
     getRental(id)
       .then(r => {
         setRental(r.data);
-        // Load nearby properties in same postcode
         if (r.data?.postcode) {
           searchRentals({ postcode: r.data.postcode, page: 1, sortBy: 'rent', sortDir: 'asc' })
             .then(res => {
@@ -96,6 +147,7 @@ export default function RentalDetail() {
         const rating = r.data?.rating ?? r.data?.userRating ?? 0;
         setUserRating(rating);
         setPendingRating(rating);
+        setComment(r.data?.comment ?? '');
       })
       .catch(() => { });
   }, [id, token]);
@@ -106,9 +158,12 @@ export default function RentalDetail() {
     setRatingError('');
     setRatingSuccess('');
     try {
-      await postRating(id, pendingRating, token);
+      await postRating(id, pendingRating, token, comment || undefined);
       setUserRating(pendingRating);
       setRatingSuccess('Rating submitted successfully!');
+      // Refresh rental to update average + reviews
+      const r = await getRental(id);
+      setRental(r.data);
     } catch {
       setRatingError('Failed to submit rating. Please try again.');
     } finally {
@@ -116,11 +171,19 @@ export default function RentalDetail() {
     }
   };
 
+  // FIX: share button with fallback for non-HTTPS / no clipboard API
   const handleShare = () => {
-    navigator.clipboard?.writeText(window.location.href).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
+    const url = window.location.href;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }).catch(() => {
+        prompt('Copy this link:', url);
+      });
+    } else {
+      prompt('Copy this link:', url);
+    }
   };
 
   if (loading) return (
@@ -142,9 +205,10 @@ export default function RentalDetail() {
   const lat = rental.latitude ?? rental.lat;
   const lng = rental.longitude ?? rental.lng ?? rental.lon;
   const hasMap = lat && lng;
-  const avgRating = rental.avgRating ?? rental.rating;
+  const avgRating = rental.avgRating ?? rental.averageRating ?? rental.rating;
   const ratingCount = rental.ratingCount ?? rental.numRatings ?? 0;
   const nearbyWithCoords = nearbyProperties.filter(p => p.latitude && p.longitude);
+  const reviews = rental.reviews ?? [];
 
   return (
     <div style={{ fontFamily: 'var(--mons)', minHeight: 'calc(100vh - 56px)', background: '#f8f9fa' }}>
@@ -234,17 +298,33 @@ export default function RentalDetail() {
                   </Col>
                   <Col md={6}>
                     {rental.agency && <InfoItem icon={<FaBuilding size={13} />} label="Agency" value={rental.agency} />}
+                    {rental.agencyName && <InfoItem icon={<FaBuilding size={13} />} label="Agency" value={rental.agencyName} />}
                     {rental.streetAddress && <InfoItem icon={<FaMapMarkerAlt size={13} />} label="Street Address" value={rental.streetAddress} />}
                     {rental.amenities && <InfoItem icon={<FaHome size={13} />} label="Amenities" value={rental.amenities} />}
                   </Col>
                 </Row>
               </Card.Body>
             </Card>
+
+            {/* NEW: Reviews section — populated from A3 API reviews[] field */}
+            <Card className="border-0 shadow-sm mb-4" style={{ borderRadius: 12 }}>
+              <Card.Body>
+                <h5 className="fw-bold mb-3" style={{ fontSize: '1rem', color: '#0f172a' }}>
+                  <FaCommentAlt className="me-2 text-primary" size={14} />
+                  Reviews
+                  {reviews.length > 0 && (
+                    <Badge bg="secondary" className="ms-2 fw-normal" style={{ fontSize: '0.75rem' }}>
+                      {reviews.length}
+                    </Badge>
+                  )}
+                </h5>
+                <ReviewsList reviews={reviews} />
+              </Card.Body>
+            </Card>
           </Col>
 
           {/* Right col */}
           <Col lg={5}>
-            {/* Map — shows current property + nearby in same postcode */}
             {hasMap && (
               <Card className="border-0 shadow-sm mb-4 overflow-hidden" style={{ borderRadius: 12 }}>
                 <Card.Body className="p-0">
@@ -254,9 +334,7 @@ export default function RentalDetail() {
                     zoom={nearbyWithCoords.length > 0 ? 13 : 15}
                     attribution={false}
                   >
-                    {/* Current property — highlighted */}
                     <Marker width={50} anchor={[parseFloat(lat), parseFloat(lng)]} color="#ef4444" />
-                    {/* Nearby properties */}
                     {nearbyWithCoords.map(p => (
                       <Marker
                         key={p.id}
@@ -309,9 +387,23 @@ export default function RentalDetail() {
                       {userRating > 0 ? `Your rating: ${userRating}/5 — Update it?` : 'Rate this property:'}
                     </p>
                     <StarRatingInput value={pendingRating} onChange={setPendingRating} disabled={ratingSubmitting} />
+                    {/* NEW: optional comment textarea */}
+                    <textarea
+                      className="form-control mt-3"
+                      rows={3}
+                      placeholder="Leave a comment (optional, max 2000 chars)"
+                      maxLength={2000}
+                      value={comment}
+                      onChange={e => setComment(e.target.value)}
+                      style={{ borderRadius: 8, fontSize: '0.85rem', resize: 'vertical' }}
+                      disabled={ratingSubmitting}
+                    />
+                    <div className="text-end mt-1" style={{ fontSize: '0.73rem', color: '#94a3b8' }}>
+                      {comment.length}/2000
+                    </div>
                     <Button
                       variant="primary"
-                      className="btn1 mt-3 w-100 fw-semibold"
+                      className="btn1 mt-2 w-100 fw-semibold"
                       style={{ borderRadius: 8 }}
                       onClick={handleRatingSubmit}
                       disabled={!pendingRating || ratingSubmitting}
@@ -335,7 +427,6 @@ export default function RentalDetail() {
               </Card.Body>
             </Card>
 
-            {/* Nearby properties list */}
             {nearbyProperties.length > 0 && (
               <Card className="border-0 shadow-sm" style={{ borderRadius: 12 }}>
                 <Card.Body>
@@ -348,10 +439,7 @@ export default function RentalDetail() {
                       <div
                         key={p.id}
                         onClick={() => navigate(`/rental/${p.id}`)}
-                        style={{
-                          cursor: 'pointer', padding: '10px 12px', borderRadius: 8,
-                          border: '1px solid #e2e8f0', transition: 'all 0.15s', background: '#fff'
-                        }}
+                        style={{ cursor: 'pointer', padding: '10px 12px', borderRadius: 8, border: '1px solid #e2e8f0', transition: 'all 0.15s', background: '#fff' }}
                         className="nearby-card"
                       >
                         <div className="d-flex justify-content-between align-items-start">

@@ -3,7 +3,6 @@ import { Navbar, Nav, Container, Button, Modal } from 'react-bootstrap';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
 import { CgProfile } from "react-icons/cg";
 
 export default function NavigationBar() {
@@ -24,7 +23,6 @@ export default function NavigationBar() {
       <Container>
         <Navbar.Brand as={NavLink} to="/" className="fw-bold text-primary">
           <img src="/pictures/LarpRentals.png" alt="House" style={{ width: '50px', height: '50px' }} />
-
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
@@ -42,16 +40,19 @@ export default function NavigationBar() {
 
           <Nav>
             {token ? (
-              <Button variant="outline-danger" onClick={handleLogout} className="btn1 font-family: var(--mons) ms-2">
-                Logout
-              </Button>
-            ) : (
-              <>
-
-                <Nav.Link className='ml-5' as={NavLink} to="/login"><CgProfile size={'27px'}></CgProfile>
-
+              <div className="d-flex align-items-center gap-2">
+                {/* NEW: Profile link for logged-in users */}
+                <Nav.Link as={NavLink} to="/profile" title="My Profile">
+                  <CgProfile size={'27px'} />
                 </Nav.Link>
-              </>
+                <Button variant="outline-danger" onClick={handleLogout} className="btn1 ms-1" style={{ fontFamily: 'var(--mons)' }}>
+                  Logout
+                </Button>
+              </div>
+            ) : (
+              <Nav.Link as={NavLink} to="/login">
+                <CgProfile size={'27px'} />
+              </Nav.Link>
             )}
           </Nav>
         </Navbar.Collapse>
@@ -69,10 +70,7 @@ export default function NavigationBar() {
           <Button variant="danger" onClick={handleClose}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={() => {
-            handleClose();
-            navigate('/login');
-          }}>
+          <Button variant="primary" onClick={() => { handleClose(); navigate('/login'); }}>
             Go to Login
           </Button>
         </Modal.Footer>

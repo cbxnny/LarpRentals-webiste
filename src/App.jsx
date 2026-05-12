@@ -7,8 +7,10 @@ import Register from './pages/Register';
 import RatedRentals from './pages/RatedRentals';
 import Navbar from './components/NavBar';
 import About from './pages/About';
+import Profile from './pages/Profile';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+
 
 AOS.init();
 
@@ -25,6 +27,7 @@ export default function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/rated" element={<RatedRentals />} />
         <Route path="/about" element={<About />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </BrowserRouter>
   );

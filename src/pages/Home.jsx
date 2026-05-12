@@ -1,4 +1,5 @@
-import { Container, Row, Col, Button, Card, } from 'react-bootstrap';
+import { useEffect } from 'react';
+import { Container, Row, Col, Button, Card } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { FaHouseUser } from "react-icons/fa";
 import { FaSearch } from "react-icons/fa";
@@ -6,25 +7,24 @@ import { FaStar } from "react-icons/fa";
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
-AOS.init();
-
-
 export default function Home() {
     const navigate = useNavigate();
 
-    return (
+    useEffect(() => {
+        AOS.init();
+    }, []);
 
+    return (
         <div data-aos="fade-down" data-aos-duration="500" className="bg-light pb-5" style={{ minHeight: 'calc(100vh - 56px)' }}>
             {/* Hero Section */}
             <div
-
                 className="text-white text-center d-flex align-items-center justify-content-center mb-5"
                 style={{
                     minHeight: '95vh',
                     background: 'linear-gradient(rgba(0,30,60,0.7), rgba(0,30,60,0.7)), url("https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80") no-repeat center center/cover'
                 }}
             >
-                <Container >
+                <Container>
                     <h1 className="display-3 fw-bold mb-4 text-white drop-shadow">Find Your Dream Home in Australia</h1>
                     <p className="lead mb-5 fs-4 text-light">Explore thousands of rental properties across every state and territory.</p>
                     <Button
@@ -32,7 +32,6 @@ export default function Home() {
                         variant="primary"
                         size="lg"
                         className="btn1 px-5 py-3 rounded-pill fw-bold shadow-lg"
-
                         onClick={() => navigate('/search')}
                     >
                         Start Your Search

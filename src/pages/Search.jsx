@@ -11,7 +11,6 @@ import {
 
 const PAGE_SIZE = 10;
 
-/* ─── Tiny helpers ─────────────────────────────────────────────── */
 function SortIcon({ column, sortColumn, sortDir }) {
   if (sortColumn !== column) return <FaSort className="ms-1 text-muted opacity-50" size={10} />;
   return sortDir === 'asc'
@@ -30,7 +29,6 @@ function StarDisplay({ rating, count }) {
   );
 }
 
-/* ─── Virtual / infinite scroll table ─────────────────────────── */
 const ROW_HEIGHT = 48;
 const OVERSCAN = 5;
 
@@ -55,7 +53,6 @@ function VirtualTable({ columns, rows, onRowClick, sortColumn, sortDir, onSort, 
 
   return (
     <div style={{ border: '1px solid #e2e8f0', borderRadius: 8, overflow: 'hidden', fontFamily: 'var(--mons)' }}>
-      {/* Sticky header */}
       <div style={{ overflowX: 'auto', background: '#1e293b' }}>
         <table style={{ width: '100%', minWidth: 820, borderCollapse: 'collapse', tableLayout: 'fixed' }}>
           <colgroup>
@@ -92,7 +89,6 @@ function VirtualTable({ columns, rows, onRowClick, sortColumn, sortDir, onSort, 
         </table>
       </div>
 
-      {/* Scrollable body */}
       <div
         ref={containerRef}
         onScroll={e => setScrollTop(e.target.scrollTop)}
@@ -112,7 +108,6 @@ function VirtualTable({ columns, rows, onRowClick, sortColumn, sortDir, onSort, 
             {columns.map(c => <col key={c.key} style={{ width: c.width }} />)}
           </colgroup>
           <tbody>
-            {/* spacer above */}
             {startIdx > 0 && (
               <tr style={{ height: startIdx * ROW_HEIGHT }}>
                 <td colSpan={columns.length} />
@@ -148,7 +143,6 @@ function VirtualTable({ columns, rows, onRowClick, sortColumn, sortDir, onSort, 
                 ))}
               </tr>
             ))}
-            {/* spacer below */}
             {endIdx < rows.length && (
               <tr style={{ height: (rows.length - endIdx) * ROW_HEIGHT }}>
                 <td colSpan={columns.length} />
@@ -161,7 +155,6 @@ function VirtualTable({ columns, rows, onRowClick, sortColumn, sortDir, onSort, 
   );
 }
 
-/* ─── Map view ─────────────────────────────────────────────────── */
 function MapView({ results, onMarkerClick }) {
   const withCoords = results.filter(r => r.latitude && r.longitude);
   if (withCoords.length === 0) {
@@ -198,7 +191,6 @@ function MapView({ results, onMarkerClick }) {
   );
 }
 
-/* ─── Active filter chips ──────────────────────────────────────── */
 function FilterChip({ label, onRemove }) {
   return (
     <span
@@ -218,7 +210,6 @@ function FilterChip({ label, onRemove }) {
   );
 }
 
-/* ─── Main component  */
 export default function Search() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -236,7 +227,6 @@ export default function Search() {
   const [minParking, setMinParking] = useState(searchParams.get('minParking') || '');
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  // result state — all rows across ALL pages accumulated for virtual scroll
   const [allRows, setAllRows] = useState([]);
   const [total, setTotal] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -248,16 +238,14 @@ export default function Search() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [searched, setSearched] = useState(false);
-  const [viewMode, setViewMode] = useState('table'); // 'table' | 'map'
+  const [viewMode, setViewMode] = useState('table');
 
-  // track current filter params so load-more uses same filters
   const activeFiltersRef = useRef({});
 
   useEffect(() => {
     getStates().then(r => setStates(r.data)).catch(() => { });
     getPropertyTypes().then(r => setPropertyTypes(r.data)).catch(() => { });
 
-    // auto-search if URL has params
     const hasParams = ['state', 'propertyType', 'postcode', 'suburb', 'minRent', 'maxRent',
       'minBedrooms', 'maxBedrooms', 'minBathrooms', 'minParking', 'sortBy'].some(k => searchParams.get(k));
     if (hasParams) {
@@ -334,7 +322,7 @@ export default function Search() {
       });
       setCurrentPage(nextPage);
     } catch {
-      // silently fail, user can try again
+      // silently fail
     } finally {
       setLoadingMore(false);
     }
@@ -348,18 +336,17 @@ export default function Search() {
     doFreshSearch(params);
   };
 
-  const handleSort = (col) => {
-    let newDir = 'asc';
-    if (sortColumn === col) newDir = sortDir === 'asc' ? 'desc' : 'asc';
+  // FIX: column header click toggles direction only for same column; otherwise resets to asc
+  const handleSort = useCallback((col, explicitDir) => {
+    const newDir = explicitDir ?? (sortColumn === col ? (sortDir === 'asc' ? 'desc' : 'asc') : 'asc');
     setSortColumn(col);
     setSortDir(newDir);
     const params = { ...activeFiltersRef.current, sortBy: col, sortDir: newDir, page: 1 };
     activeFiltersRef.current = params;
     setSearchParams(Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)])));
     doFreshSearch(params);
-  };
+  }, [sortColumn, sortDir]);
 
-  // clear a single filter chip
   const clearFilter = (key, setter) => {
     setter('');
     setTimeout(() => {
@@ -388,51 +375,21 @@ export default function Search() {
   }, [selectedState, selectedType, postcode, suburb, minRent, maxRent, minBeds, maxBeds, minBaths, minParking]);
 
   const COLUMNS = [
-    {
-      key: 'title', label: 'Title', width: '22%',
-      render: r => <span className="fw-semibold text-dark">{r.title}</span>
-    },
-    {
-      key: 'rent', label: 'Rent/wk', width: '9%', align: 'right',
-      render: r => <span className="text-success fw-bold">${r.rent?.toLocaleString()}</span>
-    },
-    {
-      key: 'propertyType', label: 'Type', width: '10%',
-      render: r => <Badge bg="secondary" className="fw-normal">{r.propertyType}</Badge>
-    },
+    { key: 'title', label: 'Title', width: '22%', render: r => <span className="fw-semibold text-dark">{r.title}</span> },
+    { key: 'rent', label: 'Rent/wk', width: '9%', align: 'right', render: r => <span className="text-success fw-bold">${r.rent?.toLocaleString()}</span> },
+    { key: 'propertyType', label: 'Type', width: '10%', render: r => <Badge bg="secondary" className="fw-normal">{r.propertyType}</Badge> },
     { key: 'suburb', label: 'Suburb', width: '11%' },
-    {
-      key: 'state', label: 'State', width: '7%', align: 'center',
-      render: r => <Badge bg="primary" className="fw-normal">{r.state}</Badge>
-    },
+    { key: 'state', label: 'State', width: '7%', align: 'center', render: r => <Badge bg="primary" className="fw-normal">{r.state}</Badge> },
     { key: 'postcode', label: 'Postcode', width: '8%', align: 'center' },
-    {
-      key: 'bedrooms', label: 'Beds', width: '6%', align: 'center',
-      render: r => r.bedrooms ?? '—'
-    },
-    {
-      key: 'bathrooms', label: 'Baths', width: '6%', align: 'center',
-      render: r => r.bathrooms ?? '—'
-    },
-    {
-      key: 'parking', label: 'Parking', width: '7%', align: 'center',
-      render: r => r.parking ?? '—'
-    },
-    {
-      key: 'rating', label: 'Rating', width: '10%', sortable: false,
-      render: r => <StarDisplay rating={r.avgRating ?? r.rating} count={r.ratingCount ?? r.numRatings ?? 0} />
-    },
-    {
-      key: 'map', label: '', width: '4%', sortable: false,
-      render: r => (r.latitude && r.longitude)
-        ? <span title="Has location" style={{ color: '#3b82f6', fontSize: '0.75rem' }}>📍</span>
-        : null
-    },
+    { key: 'bedrooms', label: 'Beds', width: '6%', align: 'center', render: r => r.bedrooms ?? '—' },
+    { key: 'bathrooms', label: 'Baths', width: '6%', align: 'center', render: r => r.bathrooms ?? '—' },
+    { key: 'parking', label: 'Parking', width: '7%', align: 'center', render: r => r.parking ?? '—' },
+    { key: 'rating', label: 'Rating', width: '10%', sortable: false, render: r => <StarDisplay rating={r.avgRating ?? r.rating} count={r.ratingCount ?? r.numRatings ?? 0} /> },
+    { key: 'map', label: '', width: '4%', sortable: false, render: r => (r.latitude && r.longitude) ? <span title="Has location" style={{ color: '#3b82f6', fontSize: '0.75rem' }}>📍</span> : null },
   ];
 
   return (
     <div data-aos="fade-up" data-aos-duration="500" style={{ minHeight: 'calc(100vh - 56px)', background: '#f8f9fa', fontFamily: 'var(--mons)' }}>
-      {/* Header */}
       <div style={{ background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)', color: 'white', padding: '2rem 0 1.5rem', boxShadow: '0 2px 12px rgba(0,0,0,0.15)' }}>
         <Container>
           <h2 className="fw-bold mb-1" style={{ letterSpacing: '-0.5px' }}>Rental Search</h2>
@@ -443,7 +400,6 @@ export default function Search() {
       </div>
 
       <Container className="pb-5 pt-4">
-        {/* Filter Card */}
         <Card className="shadow-sm mb-3 border-0" style={{ borderRadius: 12 }}>
           <Card.Body className="p-4">
             <Form onSubmit={handleSearch}>
@@ -478,27 +434,14 @@ export default function Search() {
               </Row>
 
               <div className="mt-3 d-flex align-items-center gap-2">
-                <Button
-                  variant="link"
-                  className="p-0 text-decoration-none small"
-                  style={{ color: '#64748b' }}
-                  onClick={() => setShowAdvanced(v => !v)}
-                  type="button"
-                >
+                <Button variant="link" className="p-0 text-decoration-none small" style={{ color: '#64748b' }} onClick={() => setShowAdvanced(v => !v)} type="button">
                   <FaFilter size={11} className="me-1" />
                   {showAdvanced ? <><FaChevronUp size={10} className="me-1" />Hide Advanced Filters</> : <><FaChevronDown size={10} className="me-1" />Advanced Filters</>}
                 </Button>
                 {activeChips.length > 0 && (
-                  <Button
-                    variant="link"
-                    className="p-0 text-decoration-none small text-danger"
-                    onClick={() => {
-                      setSelectedState(''); setSelectedType(''); setPostcode(''); setSuburb('');
-                      setMinRent(''); setMaxRent(''); setMinBeds(''); setMaxBeds('');
-                      setMinBaths(''); setMinParking('');
-                    }}
-                    type="button"
-                  >
+                  <Button variant="link" className="p-0 text-decoration-none small text-danger"
+                    onClick={() => { setSelectedState(''); setSelectedType(''); setPostcode(''); setSuburb(''); setMinRent(''); setMaxRent(''); setMinBeds(''); setMaxBeds(''); setMinBaths(''); setMinParking(''); }}
+                    type="button">
                     Clear all
                   </Button>
                 )}
@@ -509,17 +452,18 @@ export default function Search() {
                   <hr className="mt-2 mb-3" />
                   <Row className="g-3">
                     {[
-                      ['Min Rent ($/wk)', minRent, setMinRent, 'minRent'],
-                      ['Max Rent ($/wk)', maxRent, setMaxRent, 'maxRent'],
-                      ['Min Bedrooms', minBeds, setMinBeds, 'minBedrooms'],
-                      ['Max Bedrooms', maxBeds, setMaxBeds, 'maxBedrooms'],
-                      ['Min Bathrooms', minBaths, setMinBaths, 'minBathrooms'],
-                      ['Min Parking', minParking, setMinParking, 'minParking'],
+                      ['Min Rent ($/wk)', minRent, setMinRent],
+                      ['Max Rent ($/wk)', maxRent, setMaxRent],
+                      ['Min Bedrooms', minBeds, setMinBeds],
+                      ['Max Bedrooms', maxBeds, setMaxBeds],
+                      ['Min Bathrooms', minBaths, setMinBaths],
+                      ['Min Parking', minParking, setMinParking],
                     ].map(([label, val, setter]) => (
                       <Col md={2} key={label}>
                         <Form.Label className="fw-semibold small text-muted">{label}</Form.Label>
                         <Form.Control
-                          type="number" min={0} max={label.includes('Bed') || label.includes('Bath') || label.includes('Park') ? 10 : undefined}
+                          type="number" min={0}
+                          max={label.includes('Bed') || label.includes('Bath') || label.includes('Park') ? 10 : undefined}
                           placeholder="Any" value={val} onChange={e => setter(e.target.value)} style={{ borderRadius: 8 }}
                         />
                       </Col>
@@ -531,7 +475,6 @@ export default function Search() {
           </Card.Body>
         </Card>
 
-        {/* Active filter chips */}
         {activeChips.length > 0 && (
           <div className="mb-3 d-flex flex-wrap align-items-center">
             <span className="text-muted small me-2">Active filters:</span>
@@ -539,10 +482,8 @@ export default function Search() {
           </div>
         )}
 
-        {/* Error */}
         {error && <div className="alert alert-danger rounded-3">{error}</div>}
 
-        {/* Loading initial */}
         {loading && (
           <div className="text-center py-5">
             <Spinner animation="border" variant="primary" />
@@ -550,10 +491,8 @@ export default function Search() {
           </div>
         )}
 
-        {/* Results */}
         {!loading && searched && (
           <>
-            {/* Results toolbar */}
             <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
               <div>
                 {total === 0
@@ -567,14 +506,14 @@ export default function Search() {
                 }
               </div>
               <div className="d-flex align-items-center gap-2">
-                {/* Sort controls */}
+
                 <div className="d-flex align-items-center gap-1">
                   <span className="text-muted small">Sort:</span>
                   <Form.Select
                     size="sm"
                     style={{ width: 'auto', borderRadius: 6 }}
                     value={sortColumn}
-                    onChange={e => handleSort(e.target.value)}
+                    onChange={e => handleSort(e.target.value, sortDir)}
                   >
                     {[
                       { key: 'rent', label: 'Rent' },
@@ -587,34 +526,22 @@ export default function Search() {
                       { key: 'propertyType', label: 'Type' },
                     ].map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
                   </Form.Select>
+
                   <Form.Select
                     size="sm"
                     style={{ width: 'auto', borderRadius: 6 }}
                     value={sortDir}
-                    onChange={e => { setSortDir(e.target.value); handleSort(sortColumn); }}
+                    onChange={e => handleSort(sortColumn, e.target.value)}
                   >
                     <option value="asc">↑ Asc</option>
                     <option value="desc">↓ Desc</option>
                   </Form.Select>
                 </div>
-                {/* View toggle */}
                 <div className="btn-group btn-group-sm" role="group">
-                  <button
-                    type="button"
-                    className={`btn ${viewMode === 'table' ? 'btn-primary' : 'btn-outline-secondary'}`}
-                    onClick={() => setViewMode('table')}
-                    title="Table view"
-                    style={{ borderRadius: '6px 0 0 6px' }}
-                  >
+                  <button type="button" className={`btn ${viewMode === 'table' ? 'btn-primary' : 'btn-outline-secondary'}`} onClick={() => setViewMode('table')} title="Table view" style={{ borderRadius: '6px 0 0 6px' }}>
                     <FaList size={12} />
                   </button>
-                  <button
-                    type="button"
-                    className={`btn ${viewMode === 'map' ? 'btn-primary' : 'btn-outline-secondary'}`}
-                    onClick={() => setViewMode('map')}
-                    title="Map view"
-                    style={{ borderRadius: '0 6px 6px 0' }}
-                  >
+                  <button type="button" className={`btn ${viewMode === 'map' ? 'btn-primary' : 'btn-outline-secondary'}`} onClick={() => setViewMode('map')} title="Map view" style={{ borderRadius: '0 6px 6px 0' }}>
                     <FaMap size={12} />
                   </button>
                 </div>
@@ -642,16 +569,9 @@ export default function Search() {
                   onSort={handleSort}
                   loading={false}
                 />
-                {/* Load more */}
                 {hasMore && (
                   <div className="text-center mt-3">
-                    <Button
-                      variant="outline-primary"
-                      onClick={loadMoreRows}
-                      disabled={loadingMore}
-                      style={{ borderRadius: 20, paddingInline: 32 }}
-                      className="btn1"
-                    >
+                    <Button variant="outline-primary" onClick={loadMoreRows} disabled={loadingMore} style={{ borderRadius: 20, paddingInline: 32 }} className="btn1">
                       {loadingMore
                         ? <><Spinner size="sm" animation="border" className="me-2" />Loading more...</>
                         : `Load more (${total - allRows.length} remaining)`
@@ -664,7 +584,6 @@ export default function Search() {
           </>
         )}
 
-        {/* Empty state before first search */}
         {!loading && !searched && (
           <Card className="text-center py-5 border-0 shadow-sm" style={{ borderRadius: 12 }}>
             <Card.Body>

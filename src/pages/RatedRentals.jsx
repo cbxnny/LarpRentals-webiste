@@ -3,7 +3,7 @@ import { Container, Card, Table, Badge, Spinner, Button, Pagination, Alert } fro
 import { useNavigate } from 'react-router-dom';
 import { getRatedRentals, getRental } from '../api/rentals';
 import { useAuth } from '../context/AuthContext';
-import { FaStar, FaExternalLinkAlt, FaSearch } from 'react-icons/fa';
+import { FaStar, FaExternalLinkAlt, FaSearch, FaCommentAlt } from 'react-icons/fa';
 
 const PAGE_SIZE = 15;
 
@@ -13,26 +13,6 @@ function StarBadge({ rating }) {
       <FaStar size={13} />
       {Number(rating).toFixed(1)}
     </span>
-  );
-}
-
-function SkeletonRow({ cols }) {
-  return (
-    <tr>
-      {Array.from({ length: cols }).map((_, i) => (
-        <td key={i}>
-          <div
-            style={{
-              height: 14, borderRadius: 4,
-              background: 'linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%)',
-              backgroundSize: '200% 100%',
-              animation: 'shimmer 1.4s infinite',
-              width: i === 0 ? '80%' : '60%',
-            }}
-          />
-        </td>
-      ))}
-    </tr>
   );
 }
 
@@ -48,6 +28,7 @@ export default function RatedRentals() {
   const [enriching, setEnriching] = useState(false);
   const [error, setError] = useState('');
 
+  // FIX: defined with useCallback so it can be listed as a dep without causing infinite loops
   const fetchPage = useCallback(async (p) => {
     setLoading(true);
     setError('');
@@ -73,7 +54,6 @@ export default function RatedRentals() {
   const enrichRatings = useCallback(async (ratingList) => {
     if (ratingList.length === 0) { setEnriched([]); return; }
     setEnriching(true);
-    // Show skeleton rows immediately
     setEnriched(ratingList.map(r => ({ ...r, rentalId: r.rentalId ?? r.rental_id ?? r.id, rental: null })));
 
     const results = await Promise.allSettled(
@@ -91,10 +71,11 @@ export default function RatedRentals() {
     setEnriching(false);
   }, []);
 
+  // FIX: include fetchPage and enrichRatings in deps — both are stable useCallback references
   useEffect(() => {
     if (!token) { navigate('/login'); return; }
     fetchPage(page).then(enrichRatings);
-  }, [page, token]);
+  }, [page, token, fetchPage, enrichRatings, navigate]);
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
@@ -104,6 +85,8 @@ export default function RatedRentals() {
       return new Intl.DateTimeFormat('en-AU', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(dateStr));
     } catch { return dateStr; }
   };
+
+  const HEADERS = ['Title', 'Rent/wk', 'Type', 'Postcode', 'State', 'Suburb', 'Beds', 'Baths', 'Parking', 'Your Rating', 'Comment', 'Rated On', ''];
 
   return (
     <div data-aos="fade-up" data-aos-duration="500" style={{ fontFamily: 'var(--mons)', minHeight: 'calc(100vh - 56px)', background: '#f8f9fa' }}>
@@ -145,9 +128,9 @@ export default function RatedRentals() {
             <Card className="border-0 shadow-sm" style={{ borderRadius: 12, overflow: 'hidden' }}>
               <div className="table-responsive">
                 <Table hover className="mb-0 align-middle">
-                  <thead style={{ background: '#1e293b',  }}>
+                  <thead style={{ background: '#1e293b' }}>
                     <tr>
-                      {['Title', 'Rent/wk', 'Type', 'Postcode', 'State', 'Suburb', 'Beds', 'Baths', 'Parking', 'Your Rating', 'Rated On', ''].map(h => (
+                      {HEADERS.map(h => (
                         <th key={h} style={{ fontSize: '0.78rem', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', padding: '12px', borderRight: '1px solid #334155', background: '#1e293b', color: '#94a3b8' }}>{h}</th>
                       ))}
                     </tr>
@@ -156,7 +139,10 @@ export default function RatedRentals() {
                     {enriched.map((item, i) => {
                       const r = item.rental;
                       const rating = item.rating ?? item.userRating ?? item.stars;
-                      const ratedAt = item.createdAt ?? item.rated_at ?? item.timestamp ?? item.date;
+                      const ratedAt = item.createdAt ?? item.rated_at ?? item.timestamp ?? item.date ?? item.dateTime;
+                      // NEW: comment field from A3 API
+                      const reviewComment = item.comment ?? null;
+
                       return (
                         <tr
                           key={item.rentalId ?? i}
@@ -164,7 +150,7 @@ export default function RatedRentals() {
                           className="rental-row"
                           onClick={() => navigate(`/rental/${item.rentalId}`)}
                         >
-                          <td className="fw-semibold" style={{ maxWidth: 200, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontSize: '0.85rem' }}>
+                          <td className="fw-semibold" style={{ maxWidth: 180, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontSize: '0.85rem' }}>
                             {r
                               ? r.title
                               : <span style={{ display: 'inline-block', height: 14, width: '70%', borderRadius: 4, background: 'linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 50%,#f1f5f9 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.4s infinite' }} />
@@ -179,6 +165,19 @@ export default function RatedRentals() {
                           <td className="text-center" style={{ fontSize: '0.85rem' }}>{r?.bathrooms ?? '—'}</td>
                           <td className="text-center" style={{ fontSize: '0.85rem' }}>{r?.parking ?? '—'}</td>
                           <td><StarBadge rating={rating} /></td>
+                          {/* NEW: comment column */}
+                          <td style={{ maxWidth: 200, fontSize: '0.82rem', color: '#475569' }}>
+                            {reviewComment ? (
+                              <span className="d-flex align-items-start gap-1" title={reviewComment}>
+                                <FaCommentAlt size={11} className="text-muted mt-1 flex-shrink-0" />
+                                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 180, display: 'inline-block' }}>
+                                  {reviewComment}
+                                </span>
+                              </span>
+                            ) : (
+                              <span className="text-muted fst-italic" style={{ fontSize: '0.75rem' }}>No comment</span>
+                            )}
+                          </td>
                           <td className="text-muted" style={{ fontSize: '0.78rem', whiteSpace: 'nowrap' }}>{formatDate(ratedAt)}</td>
                           <td>
                             <Button
