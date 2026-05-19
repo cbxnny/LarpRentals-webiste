@@ -36,6 +36,7 @@ export default function Profile() {
         const userEmail = getEmailFromToken(token);
         if (!userEmail) { logout(); navigate('/login'); return; }
         setEmail(userEmail);
+        setLoading(true);
 
         getProfile(userEmail, token)
             .then(res => {
@@ -46,9 +47,10 @@ export default function Profile() {
                 setAddress(d.address ?? '');
             })
             .catch(err => {
+                console.error('Profile load error:', err);
                 const status = err.response?.status;
                 if (status === 401) { logout(); navigate('/login'); }
-                else setError('Failed to load profile.');
+                else setError('Failed to load profile: ' + (err.response?.data?.message ?? err.message));
             })
             .finally(() => setLoading(false));
     }, [token]);
@@ -95,7 +97,6 @@ export default function Profile() {
 
     return (
         <div
-            data-aos="fade-up"
             style={{ fontFamily: 'var(--mons)', minHeight: 'calc(100vh - 56px)', background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)' }}
             className="d-flex align-items-start pt-5"
         >

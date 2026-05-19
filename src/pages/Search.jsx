@@ -336,7 +336,7 @@ export default function Search() {
     doFreshSearch(params);
   };
 
-  // FIX: column header click toggles direction only for same column; otherwise resets to asc
+
   const handleSort = useCallback((col, explicitDir) => {
     const newDir = explicitDir ?? (sortColumn === col ? (sortDir === 'asc' ? 'desc' : 'asc') : 'asc');
     setSortColumn(col);

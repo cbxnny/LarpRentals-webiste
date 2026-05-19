@@ -21,7 +21,7 @@ function verifyToken(token) {
     }
 }
 
-// ── Middleware: required auth — rejects if no/bad token ───────
+
 function requireAuth(req, res, next) {
     const { token, error: extractError } = extractToken(req);
 
