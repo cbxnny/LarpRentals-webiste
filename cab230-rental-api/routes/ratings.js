@@ -3,7 +3,7 @@ const router = express.Router();
 const db = require('../middleware/db');
 const { requireAuth } = require('../middleware/auth');
 
-// ── POST /ratings/debugEraseRatings ──────────────────────────
+// POST /ratings/debugEraseRatings
 router.post('/debugEraseRatings', async (req, res) => {
     try {
         await db('ratings').delete();
@@ -14,7 +14,7 @@ router.post('/debugEraseRatings', async (req, res) => {
     }
 });
 
-// ── GET /ratings — all ratings by the logged-in user ─────────
+//  GET /ratings 
 router.get('/', requireAuth, async (req, res) => {
     try {
         const { email } = req.user;
@@ -60,7 +60,7 @@ router.get('/', requireAuth, async (req, res) => {
     }
 });
 
-// ── GET /ratings/rentals/:id — get logged-in user's rating for a rental ──────
+// GET /ratings/rentals/:id — get logged-in user's rating for a rental 
 router.get('/rentals/:id', requireAuth, async (req, res) => {
     const { id } = req.params;
     if (isNaN(id)) return res.status(400).json({ error: true, message: 'Invalid rental ID' });
@@ -93,7 +93,7 @@ router.get('/rentals/:id', requireAuth, async (req, res) => {
     }
 });
 
-// ── POST /ratings/rentals/:id — submit or update a rating ────
+// POST /ratings/rentals/:id — submit or update a rating 
 router.post('/rentals/:id', requireAuth, async (req, res) => {
     const { id } = req.params;
     if (isNaN(id)) return res.status(400).json({ error: true, message: 'Invalid rental ID' });

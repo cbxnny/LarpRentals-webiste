@@ -135,7 +135,7 @@ router.get('/:email/profile', optionalAuth, async (req, res) => {
     }
 });
 
-// PUT /user/:email/profile 
+// ── PUT /user/:email/profile 
 router.put('/:email/profile', requireAuth, async (req, res) => {
     const { email } = req.params;
     const { firstName, lastName, dob, address } = req.body;
