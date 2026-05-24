@@ -7,12 +7,12 @@ const { requireAuth, optionalAuth } = require('../middleware/auth');
 
 const SALT_ROUNDS = 10;
 
-// ── Helper: generate JWT ──────────────────────────────────────
+// Helper: generate JWT  
 function generateToken(email, expiresIn = '24h') {
     return jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn });
 }
 
-// ── POST /user/register ───────────────────────────────────────
+// POST /user/register 
 router.post('/register', async (req, res) => {
     const { email, password } = req.body;
 
@@ -46,7 +46,7 @@ router.post('/register', async (req, res) => {
     }
 });
 
-// ── POST /user/login ──────────────────────────────────────────
+// POST /user/login 
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
@@ -73,7 +73,7 @@ router.post('/login', async (req, res) => {
     }
 });
 
-// ── POST /user/debugLogin — returns a token that expires in 1 second ─────────
+// POST /user/debugLogin 
 router.post('/debugLogin', async (req, res) => {
     const { email, password } = req.body;
 
@@ -100,7 +100,7 @@ router.post('/debugLogin', async (req, res) => {
     }
 });
 
-// ── GET /user/:email/profile ──────────────────────────────────
+// GET /user/:email/profile 
 router.get('/:email/profile', optionalAuth, async (req, res) => {
     const { email } = req.params;
 
@@ -118,7 +118,7 @@ router.get('/:email/profile', optionalAuth, async (req, res) => {
                 email: user.email,
                 firstName: user.firstName ?? null,
                 lastName: user.lastName ?? null,
-                dob: user.dob ?? null,
+                dob: user.dob ? new Date(user.dob).toISOString().slice(0, 10) : null,
                 address: user.address ?? null,
             });
         }
@@ -135,7 +135,7 @@ router.get('/:email/profile', optionalAuth, async (req, res) => {
     }
 });
 
-// ── PUT /user/:email/profile ──────────────────────────────────
+// PUT /user/:email/profile 
 router.put('/:email/profile', requireAuth, async (req, res) => {
     const { email } = req.params;
     const { firstName, lastName, dob, address } = req.body;
@@ -163,6 +163,9 @@ router.put('/:email/profile', requireAuth, async (req, res) => {
     const parsed = new Date(dob);
     if (isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== dob) {
         return res.status(400).json({ error: true, message: 'Invalid input: dob must be a real date in format YYYY-MM-DD.' });
+    }
+    if (parsed >= new Date()) {
+        return res.status(400).json({ error: true, message: 'Invalid input: dob must be a date in the past.' });
     }
 
     try {
