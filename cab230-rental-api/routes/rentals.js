@@ -4,7 +4,7 @@ const db = require('../middleware/db');
 
 router.get('/states', async (req, res) => {
     try {
-        const rows = await db('data').distinct('state').orderBy('state');
+        const rows = await db('rentals').distinct('state').orderBy('state');
         res.json(rows.map(r => r.state).filter(Boolean));
     } catch (err) {
         console.error(err);
@@ -14,7 +14,7 @@ router.get('/states', async (req, res) => {
 
 router.get('/property-types', async (req, res) => {
     try {
-        const rows = await db('data').distinct('propertyType').orderBy('propertyType');
+        const rows = await db('rentals').distinct('propertyType').orderBy('propertyType');
         res.json(rows.map(r => r.propertyType).filter(Boolean));
     } catch (err) {
         console.error(err);
@@ -53,7 +53,7 @@ router.get('/search', async (req, res) => {
         const perPage = 10;
         const offset = (pageNum - 1) * perPage;
 
-        let query = db('data');
+        let query = db('rentals');
 
         if (state) query = query.where('state', state);
         if (suburb) query = query.whereIlike('suburb', `%${suburb}%`);
@@ -76,35 +76,23 @@ router.get('/search', async (req, res) => {
         const lastPage = Math.ceil(total / perPage) || 1;
 
         const dbSortBy = sortBy || 'id';
+        const sortColumn = dbSortBy === 'id' ? 'rentals.id' : dbSortBy;
 
-        const rows = await query
-            .select('id', 'title', 'rent', 'propertyType', 'suburb', 'state', 'postcode', 'bedrooms', 'bathrooms', 'parkingSpaces', 'latitude', 'longitude')
-            .orderBy(dbSortBy, sortOrder)
+        const rows = await query.clone()
+            .leftJoin('ratings', 'rentals.id', 'ratings.rental_id')
+            .select('rentals.id as id', 'title', 'rent', 'propertyType', 'suburb', 'state', 'postcode', 'bedrooms', 'bathrooms', 'parkingSpaces', 'latitude', 'longitude')
+            .avg('ratings.rating as averageRating')
+            .count('ratings.id as numRatings')
+            .groupBy('rentals.id')
+            .orderBy(sortColumn, sortOrder)
             .limit(perPage)
             .offset(offset);
-
-        const ids = rows.map(r => r.id);
-        let ratingMap = {};
-        if (ids.length > 0) {
-            const ratings = await db('ratings')
-                .select('rentalId')
-                .avg('rating as avgRating')
-                .count('* as numRatings')
-                .whereIn('rentalId', ids)
-                .groupBy('rentalId');
-            ratings.forEach(r => {
-                ratingMap[r.rentalId] = {
-                    averageRating: parseFloat(Number(r.avgRating).toFixed(2)),
-                    numRatings: parseInt(r.numRatings, 10),
-                };
-            });
-        }
 
         res.json({
             data: rows.map(r => ({
                 ...r,
-                averageRating: ratingMap[r.id]?.averageRating ?? null,
-                numRatings: ratingMap[r.id]?.numRatings ?? 0,
+                averageRating: r.averageRating ? parseFloat(Number(r.averageRating).toFixed(2)) : null,
+                numRatings: parseInt(r.numRatings, 10),
             })),
             pagination: {
                 total, lastPage,
@@ -125,16 +113,16 @@ router.get('/:id', async (req, res) => {
         const { id } = req.params;
         if (isNaN(id)) return res.status(400).json({ error: true, message: 'Invalid rental ID' });
 
-        const rental = await db('data').where('id', id).first();
+        const rental = await db('rentals').where('id', id).first();
         if (!rental) return res.status(404).json({ error: true, message: 'No rental exists with this ID.' });
 
-        const [ratingRow] = await db('ratings').where('rentalId', id).avg('rating as avgRating').count('* as numRatings');
+        const [ratingRow] = await db('ratings').where('rental_id', id).avg('rating as avgRating').count('* as numRatings');
 
         const reviews = await db('ratings')
-            .where('ratings.rentalId', id)
-            .join('users', 'ratings.userId', 'users.id')
-            .select('ratings.rating', 'users.email as user', 'ratings.comment', 'ratings.createdAt as dateTime')
-            .orderBy('ratings.createdAt', 'desc');
+            .where('ratings.rental_id', id)
+            .join('users', 'ratings.user_id', 'users.id')
+            .select('ratings.rating', 'users.email as user', 'ratings.comment', 'ratings.created_at as dateTime')
+            .orderBy('ratings.created_at', 'desc');
 
         res.json({
             id: rental.id,
