@@ -1918,7 +1918,7 @@
         "tags": [
           "User"
         ],
-        "description": "Returns a user profile.",
+        "description": "Returns a user profile. Without a valid Bearer token for the profile owner, only email, firstName and lastName are returned. With the owner's token, dob and address are also included.",
         "parameters": [
           {
             "name": "email",
@@ -1929,14 +1929,9 @@
             }
           }
         ],
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
         "responses": {
           "200": {
-            "description": "Profile info",
+            "description": "Profile info (public or full, depending on authorization)",
             "content": {
               "application/json": {
                 "schema": {
@@ -1970,15 +1965,115 @@
                       ]
                     }
                   }
+                },
+                "examples": {
+                  "public": {
+                    "summary": "Unauthorised or different user",
+                    "value": {
+                      "email": "mike@gmail.com",
+                      "firstName": "Michael",
+                      "lastName": "Jordan"
+                    }
+                  },
+                  "owner": {
+                    "summary": "Profile owner",
+                    "value": {
+                      "email": "mike@gmail.com",
+                      "firstName": "Michael",
+                      "lastName": "Jordan",
+                      "dob": "1963-02-17",
+                      "address": "123 Fake Street, Springfield"
+                    }
+                  }
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized. Click on 'Schema' below to see the possible error responses.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "examples": [
+                            true
+                          ]
+                        },
+                        "message": {
+                          "type": "string",
+                          "examples": [
+                            "JWT token has expired"
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "examples": [
+                            true
+                          ]
+                        },
+                        "message": {
+                          "type": "string",
+                          "examples": [
+                            "Invalid JWT token"
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "examples": [
+                            true
+                          ]
+                        },
+                        "message": {
+                          "type": "string",
+                          "examples": [
+                            "Authorization header is malformed"
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
           "404": {
-            "description": "User not found"
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "examples": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string",
+                      "examples": [
+                        "User not found"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       },
@@ -1986,7 +2081,7 @@
         "tags": [
           "User"
         ],
-        "description": "Update profile",
+        "description": "Update profile. Users may only update their own profile.",
         "parameters": [
           {
             "name": "email",
@@ -2016,7 +2111,8 @@
                     "type": "string"
                   },
                   "dob": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Date of birth in YYYY-MM-DD format"
                   },
                   "address": {
                     "type": "string"
@@ -2034,19 +2130,246 @@
         },
         "responses": {
           "200": {
-            "description": "Updated"
+            "description": "Profile updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "email": {
+                      "type": "string"
+                    },
+                    "firstName": {
+                      "type": "string"
+                    },
+                    "lastName": {
+                      "type": "string"
+                    },
+                    "dob": {
+                      "type": "string"
+                    },
+                    "address": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "examples": [
+                  {
+                    "email": "mike@gmail.com",
+                    "firstName": "Michael",
+                    "lastName": "Jordan",
+                    "dob": "1963-02-17",
+                    "address": "123 Fake Street, Springfield"
+                  }
+                ]
+              }
+            }
           },
           "400": {
-            "description": "Bad Request"
+            "description": "Bad Request. Click on 'Schema' below to see the possible error responses.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "examples": [
+                            true
+                          ]
+                        },
+                        "message": {
+                          "type": "string",
+                          "examples": [
+                            "Request body incomplete: firstName, lastName, dob and address are required."
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "examples": [
+                            true
+                          ]
+                        },
+                        "message": {
+                          "type": "string",
+                          "examples": [
+                            "Request body invalid: firstName, lastName and address must be strings only."
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "examples": [
+                            true
+                          ]
+                        },
+                        "message": {
+                          "type": "string",
+                          "examples": [
+                            "Invalid input: dob must be a real date in format YYYY-MM-DD."
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "examples": [
+                            true
+                          ]
+                        },
+                        "message": {
+                          "type": "string",
+                          "examples": [
+                            "Invalid input: dob must be a date in the past."
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized. Click on 'Schema' below to see the possible error responses.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "examples": [
+                            true
+                          ]
+                        },
+                        "message": {
+                          "type": "string",
+                          "examples": [
+                            "Authorization header ('Bearer token') not found"
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "examples": [
+                            true
+                          ]
+                        },
+                        "message": {
+                          "type": "string",
+                          "examples": [
+                            "JWT token has expired"
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "examples": [
+                            true
+                          ]
+                        },
+                        "message": {
+                          "type": "string",
+                          "examples": [
+                            "Invalid JWT token"
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "error": {
+                          "type": "boolean",
+                          "examples": [
+                            true
+                          ]
+                        },
+                        "message": {
+                          "type": "string",
+                          "examples": [
+                            "Authorization header is malformed"
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
           },
           "403": {
-            "description": "Forbidden"
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "examples": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string",
+                      "examples": [
+                        "Forbidden"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
           },
           "404": {
-            "description": "Not found"
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "boolean",
+                      "examples": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string",
+                      "examples": [
+                        "User not found"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }

@@ -7,6 +7,29 @@ const { requireAuth, optionalAuth } = require('../middleware/auth');
 
 const SALT_ROUNDS = 10;
 
+function formatDob(value) {
+    if (value == null) return null;
+    if (typeof value === 'string') return value.slice(0, 10);
+    const d = value instanceof Date ? value : new Date(value);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+}
+
+function isRealDateString(dob) {
+    if (typeof dob !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(dob)) return false;
+    const [y, m, d] = dob.split('-').map(Number);
+    const date = new Date(Date.UTC(y, m - 1, d));
+    return date.getUTCFullYear() === y && date.getUTCMonth() === m - 1 && date.getUTCDate() === d;
+}
+
+function isPastDateString(dob) {
+    const now = new Date();
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    return dob < today;
+}
+
 // Helper: generate JWT  
 function generateToken(email, expiresIn = '24h') {
     return jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn });
@@ -118,7 +141,7 @@ router.get('/:email/profile', optionalAuth, async (req, res) => {
                 email: user.email,
                 firstName: user.firstName ?? null,
                 lastName: user.lastName ?? null,
-                dob: user.dob ? new Date(user.dob).toISOString().slice(0, 10) : null,
+                dob: formatDob(user.dob),
                 address: user.address ?? null,
             });
         }
@@ -155,16 +178,10 @@ router.put('/:email/profile', requireAuth, async (req, res) => {
         return res.status(400).json({ error: true, message: 'Request body invalid: firstName, lastName and address must be strings only.' });
     }
 
-    // Validate dob is a real YYYY-MM-DD date
-    const dobRegex = /^\d{4}-\d{2}-\d{2}$/;
-    if (!dobRegex.test(dob)) {
+    if (!isRealDateString(dob)) {
         return res.status(400).json({ error: true, message: 'Invalid input: dob must be a real date in format YYYY-MM-DD.' });
     }
-    const parsed = new Date(dob);
-    if (isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== dob) {
-        return res.status(400).json({ error: true, message: 'Invalid input: dob must be a real date in format YYYY-MM-DD.' });
-    }
-    if (parsed >= new Date()) {
+    if (!isPastDateString(dob)) {
         return res.status(400).json({ error: true, message: 'Invalid input: dob must be a date in the past.' });
     }
 
