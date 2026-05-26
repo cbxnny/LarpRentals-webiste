@@ -17,7 +17,9 @@
   "paths": {
     "/rentals/states": {
       "get": {
-        "tags": ["Rentals"],
+        "tags": [
+          "Rentals"
+        ],
         "description": "Returns a list of Australian states and territories, ordered alphabetically.",
         "responses": {
           "200": {
@@ -29,7 +31,18 @@
                   "items": {
                     "type": "string"
                   },
-                  "examples": [["ACT","NSW","NT","Qld","SA","Tas","Vic","WA"]]
+                  "examples": [
+                    [
+                      "ACT",
+                      "NSW",
+                      "NT",
+                      "Qld",
+                      "SA",
+                      "Tas",
+                      "Vic",
+                      "WA"
+                    ]
+                  ]
                 }
               }
             }
@@ -43,11 +56,15 @@
                   "properties": {
                     "error": {
                       "type": "boolean",
-                      "examples": [true]
+                      "examples": [
+                        true
+                      ]
                     },
                     "message": {
                       "type": "string",
-                      "examples": ["Invalid query parameters: yourParamHere. Query parameters are not permitted."]
+                      "examples": [
+                        "Invalid query parameters: yourParamHere. Query parameters are not permitted."
+                      ]
                     }
                   }
                 }
@@ -60,7 +77,9 @@
               "text/html": {
                 "schema": {
                   "type": "string",
-                  "examples": ["Too many requests, please try again later."]
+                  "examples": [
+                    "Too many requests, please try again later."
+                  ]
                 }
               }
             }
@@ -70,7 +89,9 @@
     },
     "/rentals/property-types": {
       "get": {
-        "tags": ["Rentals"],
+        "tags": [
+          "Rentals"
+        ],
         "description": "Returns a list of rental property types, ordered alphabetically.",
         "responses": {
           "200": {
@@ -82,7 +103,21 @@
                   "items": {
                     "type": "string"
                   },
-                  "examples": [["acreage/semi-rural","apartment","duplex/semi-detached","flat","house","other","studio","terrace","townhouse","unit","villa"]]
+                  "examples": [
+                    [
+                      "acreage/semi-rural",
+                      "apartment",
+                      "duplex/semi-detached",
+                      "flat",
+                      "house",
+                      "other",
+                      "studio",
+                      "terrace",
+                      "townhouse",
+                      "unit",
+                      "villa"
+                    ]
+                  ]
                 }
               }
             }
@@ -96,11 +131,15 @@
                   "properties": {
                     "error": {
                       "type": "boolean",
-                      "examples": [true]
+                      "examples": [
+                        true
+                      ]
                     },
                     "message": {
                       "type": "string",
-                      "examples": ["Invalid query parameters: yourParamHere. Query parameters are not permitted."]
+                      "examples": [
+                        "Invalid query parameters: yourParamHere. Query parameters are not permitted."
+                      ]
                     }
                   }
                 }
@@ -113,7 +152,9 @@
               "text/html": {
                 "schema": {
                   "type": "string",
-                  "examples": ["Too many requests, please try again later."]
+                  "examples": [
+                    "Too many requests, please try again later."
+                  ]
                 }
               }
             }
@@ -123,7 +164,9 @@
     },
     "/rentals/search": {
       "get": {
-        "tags": ["Rentals"],
+        "tags": [
+          "Rentals"
+        ],
         "description": "Returns a list of rental properties, filtered and sorted as specified. If no sort order is specified, properties will be returned sorted by id in ascending order.",
         "parameters": [
           {
@@ -142,7 +185,16 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": ["ACT","NSW","NT","Qld","SA","Tas","Vic","WA"]
+              "enum": [
+                "ACT",
+                "NSW",
+                "NT",
+                "Qld",
+                "SA",
+                "Tas",
+                "Vic",
+                "WA"
+              ]
             }
           },
           {
@@ -241,13 +293,28 @@
             "in": "query",
             "description": "If this parameter is present, only rentals that are one of the specified property types will be returned.",
             "required": false,
-            "example": ["apartment","studio"],
+            "example": [
+              "apartment",
+              "studio"
+            ],
             "explode": true,
             "schema": {
               "type": "array",
               "items": {
                 "type": "string",
-                "enum": ["acreage/semi-rural","apartment","duplex/semi-detached","flat","house","other","studio","terrace","townhouse","unit","villa"]
+                "enum": [
+                  "acreage/semi-rural",
+                  "apartment",
+                  "duplex/semi-detached",
+                  "flat",
+                  "house",
+                  "other",
+                  "studio",
+                  "terrace",
+                  "townhouse",
+                  "unit",
+                  "villa"
+                ]
               }
             }
           },
@@ -279,7 +346,20 @@
             "schema": {
               "type": "string",
               "enum": [
-                "id", "title", "rent", "propertyType", "latitude", "longitude", "postcode", "state", "suburb", "bathrooms", "bedrooms", "parkingSpaces", "averageRating", "numRatings"
+                "id",
+                "title",
+                "rent",
+                "propertyType",
+                "latitude",
+                "longitude",
+                "postcode",
+                "state",
+                "suburb",
+                "bathrooms",
+                "bedrooms",
+                "parkingSpaces",
+                "averageRating",
+                "numRatings"
               ]
             }
           },
@@ -291,7 +371,8 @@
             "schema": {
               "type": "string",
               "enum": [
-                "asc", "desc"
+                "asc",
+                "desc"
               ]
             }
           },
@@ -320,59 +401,90 @@
                         "properties": {
                           "id": {
                             "type": "integer",
-                            "examples": [5]
+                            "examples": [
+                              5
+                            ]
                           },
                           "title": {
                             "type": "string",
-                            "examples": ["Stylish Waterside Living"]
+                            "examples": [
+                              "Stylish Waterside Living"
+                            ]
                           },
                           "rent": {
                             "type": "integer",
-                            "examples": [630]
+                            "examples": [
+                              630
+                            ]
                           },
                           "propertyType": {
                             "type": "string",
-                            "examples": ["apartment"]
+                            "examples": [
+                              "apartment"
+                            ]
                           },
                           "latitude": {
                             "type": "number",
-                            "examples": [-19.32105337]
+                            "examples": [
+                              -19.32105337
+                            ]
                           },
                           "longitude": {
                             "type": "number",
-                            "examples": [146.72911663]
+                            "examples": [
+                              146.72911663
+                            ]
                           },
                           "postcode": {
                             "type": "integer",
-                            "examples": [4817]
+                            "examples": [
+                              4817
+                            ]
                           },
                           "state": {
                             "type": "string",
-                            "examples": ["Qld"]
+                            "examples": [
+                              "Qld"
+                            ]
                           },
                           "suburb": {
                             "type": "string",
-                            "examples": ["Thuringowa Central"]
+                            "examples": [
+                              "Thuringowa Central"
+                            ]
                           },
                           "bathrooms": {
                             "type": "integer",
-                            "examples": [1]
+                            "examples": [
+                              1
+                            ]
                           },
                           "bedrooms": {
                             "type": "integer",
-                            "examples": [2]
+                            "examples": [
+                              2
+                            ]
                           },
                           "parkingSpaces": {
                             "type": "integer",
-                            "examples": [2]
+                            "examples": [
+                              2
+                            ]
                           },
                           "averageRating": {
-                            "type": ["number", "null"],
-                            "examples": [3.5]
+                            "type": [
+                              "number",
+                              "null"
+                            ],
+                            "examples": [
+                              3.5
+                            ]
                           },
                           "numRatings": {
                             "type": "integer",
-                            "examples": [2]
+                            "examples": [
+                              2
+                            ]
                           }
                         }
                       }
@@ -382,35 +494,57 @@
                       "properties": {
                         "perPage": {
                           "type": "integer",
-                          "examples": [10]
+                          "examples": [
+                            10
+                          ]
                         },
                         "currentPage": {
                           "type": "integer",
-                          "examples": [1]
+                          "examples": [
+                            1
+                          ]
                         },
                         "from": {
                           "type": "integer",
-                          "examples": [0]
+                          "examples": [
+                            0
+                          ]
                         },
                         "to": {
                           "type": "integer",
-                          "examples": [10]
+                          "examples": [
+                            10
+                          ]
                         },
                         "total": {
                           "type": "integer",
-                          "examples": [6767]
+                          "examples": [
+                            6767
+                          ]
                         },
                         "lastPage": {
                           "type": "integer",
-                          "examples": [677]
+                          "examples": [
+                            677
+                          ]
                         },
                         "prevPage": {
-                          "type": ["integer", "null"],
-                          "examples": [null]
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "examples": [
+                            null
+                          ]
                         },
                         "nextPage": {
-                          "type": ["integer", "null"],
-                          "examples": [2]
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "examples": [
+                            2
+                          ]
                         }
                       }
                     }
@@ -430,11 +564,15 @@
                       "properties": {
                         "error": {
                           "type": "boolean",
-                          "examples": [true]
+                          "examples": [
+                            true
+                          ]
                         },
                         "message": {
                           "type": "string",
-                          "examples": ["Invalid postcode parameter. Must be an integer in the range of 0000-9999."]
+                          "examples": [
+                            "Invalid postcode parameter. Must be an integer in the range of 0000-9999."
+                          ]
                         }
                       }
                     },
@@ -443,11 +581,15 @@
                       "properties": {
                         "error": {
                           "type": "boolean",
-                          "examples": [true]
+                          "examples": [
+                            true
+                          ]
                         },
                         "message": {
                           "type": "string",
-                          "examples": ["Invalid minimumRent parameter. Must be a non-negative integer."]
+                          "examples": [
+                            "Invalid minimumRent parameter. Must be a non-negative integer."
+                          ]
                         }
                       }
                     },
@@ -456,11 +598,15 @@
                       "properties": {
                         "error": {
                           "type": "boolean",
-                          "examples": [true]
+                          "examples": [
+                            true
+                          ]
                         },
                         "message": {
                           "type": "string",
-                          "examples": ["Invalid maximumRent parameter. Must be a non-negative integer."]
+                          "examples": [
+                            "Invalid maximumRent parameter. Must be a non-negative integer."
+                          ]
                         }
                       }
                     },
@@ -469,11 +615,15 @@
                       "properties": {
                         "error": {
                           "type": "boolean",
-                          "examples": [true]
+                          "examples": [
+                            true
+                          ]
                         },
                         "message": {
                           "type": "string",
-                          "examples": ["Invalid minimumBathrooms parameter. Must be a non-negative integer."]
+                          "examples": [
+                            "Invalid minimumBathrooms parameter. Must be a non-negative integer."
+                          ]
                         }
                       }
                     },
@@ -482,11 +632,15 @@
                       "properties": {
                         "error": {
                           "type": "boolean",
-                          "examples": [true]
+                          "examples": [
+                            true
+                          ]
                         },
                         "message": {
                           "type": "string",
-                          "examples": ["Invalid maximumBathrooms parameter. Must be a non-negative integer."]
+                          "examples": [
+                            "Invalid maximumBathrooms parameter. Must be a non-negative integer."
+                          ]
                         }
                       }
                     },
@@ -495,11 +649,15 @@
                       "properties": {
                         "error": {
                           "type": "boolean",
-                          "examples": [true]
+                          "examples": [
+                            true
+                          ]
                         },
                         "message": {
                           "type": "string",
-                          "examples": ["Invalid minimumBedrooms parameter. Must be a non-negative integer."]
+                          "examples": [
+                            "Invalid minimumBedrooms parameter. Must be a non-negative integer."
+                          ]
                         }
                       }
                     },
@@ -508,11 +666,15 @@
                       "properties": {
                         "error": {
                           "type": "boolean",
-                          "examples": [true]
+                          "examples": [
+                            true
+                          ]
                         },
                         "message": {
                           "type": "string",
-                          "examples": ["Invalid maximumBedrooms parameter. Must be a non-negative integer."]
+                          "examples": [
+                            "Invalid maximumBedrooms parameter. Must be a non-negative integer."
+                          ]
                         }
                       }
                     },
@@ -521,11 +683,15 @@
                       "properties": {
                         "error": {
                           "type": "boolean",
-                          "examples": [true]
+                          "examples": [
+                            true
+                          ]
                         },
                         "message": {
                           "type": "string",
-                          "examples": ["Invalid minimumParking parameter. Must be a non-negative integer."]
+                          "examples": [
+                            "Invalid minimumParking parameter. Must be a non-negative integer."
+                          ]
                         }
                       }
                     },
@@ -534,11 +700,15 @@
                       "properties": {
                         "error": {
                           "type": "boolean",
-                          "examples": [true]
+                          "examples": [
+                            true
+                          ]
                         },
                         "message": {
                           "type": "string",
-                          "examples": ["Invalid maximumParking parameter. Must be a non-negative integer."]
+                          "examples": [
+                            "Invalid maximumParking parameter. Must be a non-negative integer."
+                          ]
                         }
                       }
                     },
@@ -547,11 +717,15 @@
                       "properties": {
                         "error": {
                           "type": "boolean",
-                          "examples": [true]
+                          "examples": [
+                            true
+                          ]
                         },
                         "message": {
                           "type": "string",
-                          "examples": ["Invalid minimumRating parameter. Must be a non-negative number."]
+                          "examples": [
+                            "Invalid minimumRating parameter. Must be a non-negative number."
+                          ]
                         }
                       }
                     },
@@ -560,11 +734,15 @@
                       "properties": {
                         "error": {
                           "type": "boolean",
-                          "examples": [true]
+                          "examples": [
+                            true
+                          ]
                         },
                         "message": {
                           "type": "string",
-                          "examples": ["Invalid maximumRating parameter. Must be a non-negative number."]
+                          "examples": [
+                            "Invalid maximumRating parameter. Must be a non-negative number."
+                          ]
                         }
                       }
                     },
@@ -573,11 +751,15 @@
                       "properties": {
                         "error": {
                           "type": "boolean",
-                          "examples": [true]
+                          "examples": [
+                            true
+                          ]
                         },
                         "message": {
                           "type": "string",
-                          "examples": ["Invalid sortBy parameter. Must refer to a valid sortable property."]
+                          "examples": [
+                            "Invalid sortBy parameter. Must refer to a valid sortable property."
+                          ]
                         }
                       }
                     },
@@ -586,11 +768,15 @@
                       "properties": {
                         "error": {
                           "type": "boolean",
-                          "examples": [true]
+                          "examples": [
+                            true
+                          ]
                         },
                         "message": {
                           "type": "string",
-                          "examples": ["Invalid sortOrder parameter. Must be 'asc' or 'desc'."]
+                          "examples": [
+                            "Invalid sortOrder parameter. Must be 'asc' or 'desc'."
+                          ]
                         }
                       }
                     },
@@ -599,11 +785,15 @@
                       "properties": {
                         "error": {
                           "type": "boolean",
-                          "examples": [true]
+                          "examples": [
+                            true
+                          ]
                         },
                         "message": {
                           "type": "string",
-                          "examples": ["Invalid sortOrder parameter. sortBy must be specified."]
+                          "examples": [
+                            "Invalid sortOrder parameter. sortBy must be specified."
+                          ]
                         }
                       }
                     },
@@ -612,11 +802,15 @@
                       "properties": {
                         "error": {
                           "type": "boolean",
-                          "examples": [true]
+                          "examples": [
+                            true
+                          ]
                         },
                         "message": {
                           "type": "string",
-                          "examples": ["Invalid page parameter. Must be an integer greater than or equal to 1."]
+                          "examples": [
+                            "Invalid page parameter. Must be an integer greater than or equal to 1."
+                          ]
                         }
                       }
                     }
@@ -631,7 +825,9 @@
               "text/html": {
                 "schema": {
                   "type": "string",
-                  "examples": ["Too many requests, please try again later."]
+                  "examples": [
+                    "Too many requests, please try again later."
+                  ]
                 }
               }
             }
@@ -641,7 +837,9 @@
     },
     "/rentals/{id}": {
       "get": {
-        "tags": ["Rentals"],
+        "tags": [
+          "Rentals"
+        ],
         "description": "Returns an object containing data for the specified rental property. The path parameter {id} is required.",
         "parameters": [
           {
@@ -664,75 +862,117 @@
                   "properties": {
                     "title": {
                       "type": "string",
-                      "examples": ["Great location, large family home"]
+                      "examples": [
+                        "Great location, large family home"
+                      ]
                     },
                     "rent": {
                       "type": "integer",
-                      "examples": [870]
+                      "examples": [
+                        870
+                      ]
                     },
                     "description": {
                       "type": "string",
-                      "examples": ["Tucked away in a quiet cul-de-sac in sought-after Eatons Hill, this light-filled home offers relaxed, easy living in a peaceful setting. Elevated to capture breezes year-round, it feels private, airy and welcoming from the moment you arrive. Designed for effortless indoor-outdoor flow, it's perfect for entertaining or unwinding by the pool. Enjoy the convenience of being within walking distance to buses, Eatons Hill Hotel and local shops. A spacious family home in a friendly, well-connected neighbourhood.<br/><br/>Features:<br/>• King-sized master bedroom with spa ensuite and walk-in robe<br/>• Three queen-sized bedrooms with built-in robes<br/>• Three separate internal living areas<br/>• Large dining area plus breakfast bar<br/>• Air conditioning for year-round comfort<br/>• Insulated undercover outdoor entertaining area<br/>• Solar-heated saltwater pool with feature lighting<br/>• Fully fenced, low-maintenance yard<br/>• Generous storage throughout<br/>• Elevated 795sqm block capturing natural light and breezes<br/>• Walking distance to public transport, Eatons Hill Hotel and speciality shops<br/>• Located within highly regarded school catchments and private school bus routes<br/><br/>This property will not last long. Please note that only those that have viewed the property will have their applications processed.<br/><br/>Information contained on any marketing material, website or other portal should not be relied upon and you should make your own enquiries and seek your own independent advice with respect to any property advertised or the information about the property."]
+                      "examples": [
+                        "Tucked away in a quiet cul-de-sac in sought-after Eatons Hill, this light-filled home offers relaxed, easy living in a peaceful setting. Elevated to capture breezes year-round, it feels private, airy and welcoming from the moment you arrive. Designed for effortless indoor-outdoor flow, it's perfect for entertaining or unwinding by the pool. Enjoy the convenience of being within walking distance to buses, Eatons Hill Hotel and local shops. A spacious family home in a friendly, well-connected neighbourhood.<br/><br/>Features:<br/>• King-sized master bedroom with spa ensuite and walk-in robe<br/>• Three queen-sized bedrooms with built-in robes<br/>• Three separate internal living areas<br/>• Large dining area plus breakfast bar<br/>• Air conditioning for year-round comfort<br/>• Insulated undercover outdoor entertaining area<br/>• Solar-heated saltwater pool with feature lighting<br/>• Fully fenced, low-maintenance yard<br/>• Generous storage throughout<br/>• Elevated 795sqm block capturing natural light and breezes<br/>• Walking distance to public transport, Eatons Hill Hotel and speciality shops<br/>• Located within highly regarded school catchments and private school bus routes<br/><br/>This property will not last long. Please note that only those that have viewed the property will have their applications processed.<br/><br/>Information contained on any marketing material, website or other portal should not be relied upon and you should make your own enquiries and seek your own independent advice with respect to any property advertised or the information about the property."
+                      ]
                     },
                     "propertyType": {
                       "type": "string",
-                      "examples": ["house"]
+                      "examples": [
+                        "house"
+                      ]
                     },
                     "locality": {
                       "type": "string",
-                      "examples": ["Eatons Hill"]
+                      "examples": [
+                        "Eatons Hill"
+                      ]
                     },
                     "latitude": {
                       "type": "number",
-                      "examples": [-27.33943255]
+                      "examples": [
+                        -27.33943255
+                      ]
                     },
                     "longitude": {
                       "type": "number",
-                      "examples": [152.94730591]
+                      "examples": [
+                        152.94730591
+                      ]
                     },
                     "postcode": {
                       "type": "integer",
-                      "examples": [4037]
+                      "examples": [
+                        4037
+                      ]
                     },
                     "state": {
                       "type": "string",
-                      "examples": ["Qld"]
+                      "examples": [
+                        "Qld"
+                      ]
                     },
                     "streetAddress": {
                       "type": "string",
-                      "examples": ["23 Valencia Court"]
+                      "examples": [
+                        "23 Valencia Court"
+                      ]
                     },
                     "suburb": {
                       "type": "string",
-                      "examples": ["Eatons Hill"]
+                      "examples": [
+                        "Eatons Hill"
+                      ]
                     },
                     "bathrooms": {
                       "type": "integer",
-                      "examples": [2]
+                      "examples": [
+                        2
+                      ]
                     },
                     "bedrooms": {
                       "type": "integer",
-                      "examples": [4]
+                      "examples": [
+                        4
+                      ]
                     },
                     "parkingSpaces": {
                       "type": "integer",
-                      "examples": [2]
+                      "examples": [
+                        2
+                      ]
                     },
                     "agencyName": {
                       "type": "string",
-                      "examples": ["McGrath Estate Agents Aspley"]
+                      "examples": [
+                        "McGrath Estate Agents Aspley"
+                      ]
                     },
                     "amenities": {
-                      "type": ["string", "null"],
-                      "examples": ["Garage: 2, Air Conditioning"]
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "examples": [
+                        "Garage: 2, Air Conditioning"
+                      ]
                     },
                     "averageRating": {
-                      "type": ["number", "null"],
-                      "examples": [4.25]
+                      "type": [
+                        "number",
+                        "null"
+                      ],
+                      "examples": [
+                        4.25
+                      ]
                     },
                     "numRatings": {
                       "type": "integer",
-                      "examples": [4]
+                      "examples": [
+                        4
+                      ]
                     }
                   }
                 }
@@ -748,11 +988,15 @@
                   "properties": {
                     "error": {
                       "type": "boolean",
-                      "examples": [true]
+                      "examples": [
+                        true
+                      ]
                     },
                     "message": {
                       "type": "string",
-                      "examples": ["Invalid query parameters: yourParamHere. Query parameters are not permitted."]
+                      "examples": [
+                        "Invalid query parameters: yourParamHere. Query parameters are not permitted."
+                      ]
                     }
                   }
                 }
@@ -768,11 +1012,15 @@
                   "properties": {
                     "error": {
                       "type": "boolean",
-                      "examples": [true]
+                      "examples": [
+                        true
+                      ]
                     },
                     "message": {
                       "type": "string",
-                      "examples": ["No rental exists with this ID."]
+                      "examples": [
+                        "No rental exists with this ID."
+                      ]
                     }
                   }
                 }
@@ -785,7 +1033,9 @@
               "text/html": {
                 "schema": {
                   "type": "string",
-                  "examples": ["Too many requests, please try again later."]
+                  "examples": [
+                    "Too many requests, please try again later."
+                  ]
                 }
               }
             }
@@ -795,7 +1045,9 @@
     },
     "/ratings": {
       "get": {
-        "tags": ["Ratings"],
+        "tags": [
+          "Ratings"
+        ],
         "description": "Returns a list of ratings made by the current user. This endpoint requires authorisation to use (click the 'Authorize' button and paste in a valid JWT to test this out in Swagger).",
         "parameters": [
           {
@@ -828,60 +1080,110 @@
                         "properties": {
                           "rentalId": {
                             "type": "integer",
-                            "examples": [1234]
+                            "examples": [
+                              1234
+                            ]
                           },
                           "rating": {
                             "type": "integer",
-                            "examples": [3]
+                            "examples": [
+                              3
+                            ]
                           },
                           "dateTime": {
                             "type": "string",
-                            "examples": ["2026-03-14T23:47:45.371Z"]
+                            "examples": [
+                              "2026-03-14T23:47:45.371Z"
+                            ]
                           }
                         }
                       },
-                      "examples": [[
-                        {"rentalId": 1, "rating": 3, "dateTime": "2026-03-11T23:47:18.496Z"},
-                        {"rentalId": 17, "rating": 2, "dateTime": "2026-03-10T18:26:26.153Z"},
-                        {"rentalId": 100, "rating": 4, "dateTime": "2026-03-13T21:51:48.752Z"},
-                        {"rentalId": 1234, "rating": 3, "dateTime": "2026-03-09T17:39:35.365Z"},
-                        {"rentalId": 2000, "rating": 5, "dateTime": "2026-03-12T22:23:14.986Z"}
-                      ]]
+                      "examples": [
+                        [
+                          {
+                            "rentalId": 1,
+                            "rating": 3,
+                            "dateTime": "2026-03-11T23:47:18.496Z"
+                          },
+                          {
+                            "rentalId": 17,
+                            "rating": 2,
+                            "dateTime": "2026-03-10T18:26:26.153Z"
+                          },
+                          {
+                            "rentalId": 100,
+                            "rating": 4,
+                            "dateTime": "2026-03-13T21:51:48.752Z"
+                          },
+                          {
+                            "rentalId": 1234,
+                            "rating": 3,
+                            "dateTime": "2026-03-09T17:39:35.365Z"
+                          },
+                          {
+                            "rentalId": 2000,
+                            "rating": 5,
+                            "dateTime": "2026-03-12T22:23:14.986Z"
+                          }
+                        ]
+                      ]
                     },
                     "pagination": {
                       "type": "object",
                       "properties": {
                         "total": {
                           "type": "integer",
-                          "examples": [12]
+                          "examples": [
+                            12
+                          ]
                         },
                         "lastPage": {
                           "type": "integer",
-                          "examples": [1]
+                          "examples": [
+                            1
+                          ]
                         },
                         "prevPage": {
-                          "type": ["integer", "null"],
-                          "examples": [null]
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "examples": [
+                            null
+                          ]
                         },
                         "nextPage": {
-                          "type": ["integer", "null"],
-                          "examples": [null]
+                          "type": [
+                            "integer",
+                            "null"
+                          ],
+                          "examples": [
+                            null
+                          ]
                         },
                         "perPage": {
                           "type": "integer",
-                          "examples": [20]
+                          "examples": [
+                            20
+                          ]
                         },
                         "currentPage": {
                           "type": "integer",
-                          "examples": [1]
+                          "examples": [
+                            1
+                          ]
                         },
                         "from": {
                           "type": "integer",
-                          "examples": [0]
+                          "examples": [
+                            0
+                          ]
                         },
                         "to": {
                           "type": "integer",
-                          "examples": [20]
+                          "examples": [
+                            20
+                          ]
                         }
                       }
                     }
@@ -894,16 +1196,20 @@
             "description": "Invalid query parameters.",
             "content": {
               "application/json": {
-                "schema":                     {
+                "schema": {
                   "type": "object",
                   "properties": {
                     "error": {
                       "type": "boolean",
-                      "examples": [true]
+                      "examples": [
+                        true
+                      ]
                     },
                     "message": {
                       "type": "string",
-                      "examples": ["Invalid page parameter. Must be an integer greater than or equal to 1."]
+                      "examples": [
+                        "Invalid page parameter. Must be an integer greater than or equal to 1."
+                      ]
                     }
                   }
                 }
@@ -921,11 +1227,15 @@
                       "properties": {
                         "error": {
                           "type": "boolean",
-                          "examples": [true]
+                          "examples": [
+                            true
+                          ]
                         },
                         "message": {
                           "type": "string",
-                          "examples": ["Authorization header ('Bearer token') not found"]
+                          "examples": [
+                            "Authorization header ('Bearer token') not found"
+                          ]
                         }
                       }
                     },
@@ -934,11 +1244,15 @@
                       "properties": {
                         "error": {
                           "type": "boolean",
-                          "examples": [true]
+                          "examples": [
+                            true
+                          ]
                         },
                         "message": {
                           "type": "string",
-                          "examples": ["JWT token has expired"]
+                          "examples": [
+                            "JWT token has expired"
+                          ]
                         }
                       }
                     },
@@ -947,11 +1261,15 @@
                       "properties": {
                         "error": {
                           "type": "boolean",
-                          "examples": [true]
+                          "examples": [
+                            true
+                          ]
                         },
                         "message": {
                           "type": "string",
-                          "examples": ["Invalid JWT token"]
+                          "examples": [
+                            "Invalid JWT token"
+                          ]
                         }
                       }
                     }
@@ -966,7 +1284,9 @@
               "text/html": {
                 "schema": {
                   "type": "string",
-                  "examples": ["Too many requests, please try again later."]
+                  "examples": [
+                    "Too many requests, please try again later."
+                  ]
                 }
               }
             }
@@ -976,7 +1296,9 @@
     },
     "/ratings/rentals/{id}": {
       "get": {
-        "tags": ["Ratings"],
+        "tags": [
+          "Ratings"
+        ],
         "description": "Returns the rating made by this user for rental with the specified id. This endpoint requires authorisation to use.",
         "parameters": [
           {
@@ -1004,15 +1326,22 @@
                   "properties": {
                     "rating": {
                       "type": "integer",
-                      "examples": [3]
+                      "examples": [
+                        3
+                      ]
                     },
                     "dateTime": {
                       "type": "string",
-                      "examples": ["2026-03-14T23:47:45.371Z"]
+                      "examples": [
+                        "2026-03-14T23:47:45.371Z"
+                      ]
                     }
                   },
                   "examples": [
-                    {"rating": 3, "dateTime": "2026-03-11T23:47:18.496Z"}
+                    {
+                      "rating": 3,
+                      "dateTime": "2026-03-11T23:47:18.496Z"
+                    }
                   ]
                 }
               }
@@ -1027,11 +1356,15 @@
                   "properties": {
                     "error": {
                       "type": "boolean",
-                      "examples": [true]
+                      "examples": [
+                        true
+                      ]
                     },
                     "message": {
                       "type": "string",
-                      "examples": ["Invalid query parameters: yourParamHere. Query parameters are not permitted."]
+                      "examples": [
+                        "Invalid query parameters: yourParamHere. Query parameters are not permitted."
+                      ]
                     }
                   }
                 }
@@ -1049,11 +1382,15 @@
                       "properties": {
                         "error": {
                           "type": "boolean",
-                          "examples": [true]
+                          "examples": [
+                            true
+                          ]
                         },
                         "message": {
                           "type": "string",
-                          "examples": ["Authorization header ('Bearer token') not found"]
+                          "examples": [
+                            "Authorization header ('Bearer token') not found"
+                          ]
                         }
                       }
                     },
@@ -1062,11 +1399,15 @@
                       "properties": {
                         "error": {
                           "type": "boolean",
-                          "examples": [true]
+                          "examples": [
+                            true
+                          ]
                         },
                         "message": {
                           "type": "string",
-                          "examples": ["JWT token has expired"]
+                          "examples": [
+                            "JWT token has expired"
+                          ]
                         }
                       }
                     },
@@ -1075,11 +1416,15 @@
                       "properties": {
                         "error": {
                           "type": "boolean",
-                          "examples": [true]
+                          "examples": [
+                            true
+                          ]
                         },
                         "message": {
                           "type": "string",
-                          "examples": ["Invalid JWT token"]
+                          "examples": [
+                            "Invalid JWT token"
+                          ]
                         }
                       }
                     }
@@ -1097,11 +1442,15 @@
                   "properties": {
                     "error": {
                       "type": "boolean",
-                      "examples": [true]
+                      "examples": [
+                        true
+                      ]
                     },
                     "message": {
                       "type": "string",
-                      "examples": ["No rating exists with this rental ID."]
+                      "examples": [
+                        "No rating exists with this rental ID."
+                      ]
                     }
                   }
                 }
@@ -1114,7 +1463,9 @@
               "text/html": {
                 "schema": {
                   "type": "string",
-                  "examples": ["Too many requests, please try again later."]
+                  "examples": [
+                    "Too many requests, please try again later."
+                  ]
                 }
               }
             }
@@ -1122,7 +1473,9 @@
         }
       },
       "post": {
-        "tags": ["Ratings"],
+        "tags": [
+          "Ratings"
+        ],
         "description": "Post a rating for the rental property with the specified id. If the rental property has already been rated by this user, the existing rating will be overwritten. This endpoint requires authorisation to use.",
         "parameters": [
           {
@@ -1150,7 +1503,13 @@
                 "properties": {
                   "rating": {
                     "type": "integer",
-                    "enum": [1, 2, 3, 4, 5]
+                    "enum": [
+                      1,
+                      2,
+                      3,
+                      4,
+                      5
+                    ]
                   }
                 }
               }
@@ -1167,15 +1526,22 @@
                   "properties": {
                     "rating": {
                       "type": "integer",
-                      "examples": [3]
+                      "examples": [
+                        3
+                      ]
                     },
                     "dateTime": {
                       "type": "string",
-                      "examples": ["2026-03-14T23:47:45.371Z"]
+                      "examples": [
+                        "2026-03-14T23:47:45.371Z"
+                      ]
                     }
                   },
                   "examples": [
-                    {"rating": 3, "dateTime": "2026-03-11T23:47:18.496Z"}
+                    {
+                      "rating": 3,
+                      "dateTime": "2026-03-11T23:47:18.496Z"
+                    }
                   ]
                 }
               }
@@ -1190,11 +1556,15 @@
                   "properties": {
                     "error": {
                       "type": "boolean",
-                      "examples": [true]
+                      "examples": [
+                        true
+                      ]
                     },
                     "message": {
                       "type": "string",
-                      "examples": ["Invalid rating. Rating must be an integer value between 1 and 5."]
+                      "examples": [
+                        "Invalid rating. Rating must be an integer value between 1 and 5."
+                      ]
                     }
                   }
                 }
@@ -1212,11 +1582,15 @@
                       "properties": {
                         "error": {
                           "type": "boolean",
-                          "examples": [true]
+                          "examples": [
+                            true
+                          ]
                         },
                         "message": {
                           "type": "string",
-                          "examples": ["Authorization header ('Bearer token') not found"]
+                          "examples": [
+                            "Authorization header ('Bearer token') not found"
+                          ]
                         }
                       }
                     },
@@ -1225,11 +1599,15 @@
                       "properties": {
                         "error": {
                           "type": "boolean",
-                          "examples": [true]
+                          "examples": [
+                            true
+                          ]
                         },
                         "message": {
                           "type": "string",
-                          "examples": ["JWT token has expired"]
+                          "examples": [
+                            "JWT token has expired"
+                          ]
                         }
                       }
                     },
@@ -1238,11 +1616,15 @@
                       "properties": {
                         "error": {
                           "type": "boolean",
-                          "examples": [true]
+                          "examples": [
+                            true
+                          ]
                         },
                         "message": {
                           "type": "string",
-                          "examples": ["Invalid JWT token"]
+                          "examples": [
+                            "Invalid JWT token"
+                          ]
                         }
                       }
                     }
@@ -1260,11 +1642,15 @@
                   "properties": {
                     "error": {
                       "type": "boolean",
-                      "examples": [true]
+                      "examples": [
+                        true
+                      ]
                     },
                     "message": {
                       "type": "string",
-                      "examples": ["No rental exists with this ID."]
+                      "examples": [
+                        "No rental exists with this ID."
+                      ]
                     }
                   }
                 }
@@ -1277,7 +1663,9 @@
               "text/html": {
                 "schema": {
                   "type": "string",
-                  "examples": ["Too many requests, please try again later."]
+                  "examples": [
+                    "Too many requests, please try again later."
+                  ]
                 }
               }
             }
@@ -1287,7 +1675,9 @@
     },
     "/user/register": {
       "post": {
-        "tags": ["Authentication"],
+        "tags": [
+          "Authentication"
+        ],
         "description": "Creates a new user account. A request body containing the user to be registered must be sent.",
         "requestBody": {
           "description": "An object containing the email and password of the user to be registered.",
@@ -1299,11 +1689,15 @@
                 "properties": {
                   "email": {
                     "type": "string",
-                    "examples": ["mike@gmail.com"]
+                    "examples": [
+                      "mike@gmail.com"
+                    ]
                   },
                   "password": {
                     "type": "string",
-                    "examples": ["password"]
+                    "examples": [
+                      "password"
+                    ]
                   }
                 }
               }
@@ -1320,7 +1714,9 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "examples": ["User created"]
+                      "examples": [
+                        "User created"
+                      ]
                     }
                   }
                 }
@@ -1336,11 +1732,15 @@
                   "properties": {
                     "error": {
                       "type": "boolean",
-                      "examples": [true]
+                      "examples": [
+                        true
+                      ]
                     },
                     "message": {
                       "type": "string",
-                      "examples": ["Request body incomplete, both email and password are required"]
+                      "examples": [
+                        "Request body incomplete, both email and password are required"
+                      ]
                     }
                   }
                 }
@@ -1356,11 +1756,15 @@
                   "properties": {
                     "error": {
                       "type": "boolean",
-                      "examples": [true]
+                      "examples": [
+                        true
+                      ]
                     },
                     "message": {
                       "type": "string",
-                      "examples": ["User already exists"]
+                      "examples": [
+                        "User already exists"
+                      ]
                     }
                   }
                 }
@@ -1373,7 +1777,9 @@
               "text/html": {
                 "schema": {
                   "type": "string",
-                  "examples": ["Too many requests, please try again later."]
+                  "examples": [
+                    "Too many requests, please try again later."
+                  ]
                 }
               }
             }
@@ -1384,7 +1790,9 @@
     "/user/login": {
       "post": {
         "description": "Log in to an existing user account. A request body containing the user credentials must be sent.",
-        "tags": ["Authentication"],
+        "tags": [
+          "Authentication"
+        ],
         "requestBody": {
           "description": "The credentials of the user to log in.",
           "required": true,
@@ -1395,11 +1803,15 @@
                 "properties": {
                   "email": {
                     "type": "string",
-                    "examples": ["mike@gmail.com"]
+                    "examples": [
+                      "mike@gmail.com"
+                    ]
                   },
                   "password": {
                     "type": "string",
-                    "examples": ["password"]
+                    "examples": [
+                      "password"
+                    ]
                   }
                 }
               }
@@ -1416,15 +1828,21 @@
                   "properties": {
                     "token": {
                       "type": "string",
-                      "examples": ["ajsonwebtoken"]
+                      "examples": [
+                        "ajsonwebtoken"
+                      ]
                     },
                     "tokenType": {
                       "type": "string",
-                      "examples": ["Bearer"]
+                      "examples": [
+                        "Bearer"
+                      ]
                     },
                     "expiresIn": {
                       "type": "number",
-                      "examples": [86400]
+                      "examples": [
+                        86400
+                      ]
                     }
                   }
                 }
@@ -1440,11 +1858,15 @@
                   "properties": {
                     "error": {
                       "type": "boolean",
-                      "examples": [true]
+                      "examples": [
+                        true
+                      ]
                     },
                     "message": {
                       "type": "string",
-                      "examples": ["Request body incomplete, both email and password are required"]
+                      "examples": [
+                        "Request body incomplete, both email and password are required"
+                      ]
                     }
                   }
                 }
@@ -1460,11 +1882,15 @@
                   "properties": {
                     "error": {
                       "type": "boolean",
-                      "examples": [true]
+                      "examples": [
+                        true
+                      ]
                     },
                     "message": {
                       "type": "string",
-                      "examples": ["Incorrect email or password"]
+                      "examples": [
+                        "Incorrect email or password"
+                      ]
                     }
                   }
                 }
@@ -1477,10 +1903,150 @@
               "text/html": {
                 "schema": {
                   "type": "string",
-                  "examples": ["Too many requests, please try again later."]
+                  "examples": [
+                    "Too many requests, please try again later."
+                  ]
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/user/{email}/profile": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "description": "Returns a user profile.",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Profile info",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "email": {
+                      "type": "string"
+                    },
+                    "firstName": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "lastName": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "dob": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "address": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "User"
+        ],
+        "description": "Update profile",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "firstName": {
+                    "type": "string"
+                  },
+                  "lastName": {
+                    "type": "string"
+                  },
+                  "dob": {
+                    "type": "string"
+                  },
+                  "address": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "firstName",
+                  "lastName",
+                  "dob",
+                  "address"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not found"
           }
         }
       }
