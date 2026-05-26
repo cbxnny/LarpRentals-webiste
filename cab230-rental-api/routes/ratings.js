@@ -25,14 +25,14 @@ router.get('/', requireAuth, async (req, res) => {
         const user = await db('users').where('email', email).first();
         if (!user) return res.status(404).json({ error: true, message: 'User not found' });
 
-        const [{ count }] = await db('ratings').where('user_id', user.id).count('* as count');
+        const [{ count }] = await db('ratings').where('userId', user.id).count('* as count');
         const total = parseInt(count, 10);
         const lastPage = Math.ceil(total / perPage) || 1;
 
         const rows = await db('ratings')
-            .where('user_id', user.id)
-            .select('rental_id as rentalId', 'rating', 'comment', 'created_at as dateTime')
-            .orderBy('created_at', 'desc')
+            .where('userId', user.id)
+            .select('rentalId', 'rating', 'comment', 'createdAt as dateTime')
+            .orderBy('createdAt', 'desc')
             .limit(perPage)
             .offset(offset);
 
@@ -70,11 +70,11 @@ router.get('/rentals/:id', requireAuth, async (req, res) => {
         const user = await db('users').where('email', email).first();
         if (!user) return res.status(404).json({ error: true, message: 'User not found' });
 
-        const rental = await db('rentals').where('id', id).first();
+        const rental = await db('data').where('id', id).first();
         if (!rental) return res.status(404).json({ error: true, message: 'Rental not found' });
 
         const existing = await db('ratings')
-            .where({ user_id: user.id, rental_id: id })
+            .where({ userId: user.id, rentalId: id })
             .first();
 
         if (!existing) {
@@ -85,7 +85,7 @@ router.get('/rentals/:id', requireAuth, async (req, res) => {
         res.json({
             rating: existing.rating,
             ...(existing.comment ? { comment: existing.comment } : {}),
-            dateTime: existing.created_at,
+            dateTime: existing.createdAt,
         });
     } catch (err) {
         console.error(err);
@@ -121,28 +121,27 @@ router.post('/rentals/:id', requireAuth, async (req, res) => {
         const user = await db('users').where('email', email).first();
         if (!user) return res.status(404).json({ error: true, message: 'User not found' });
 
-        const rental = await db('rentals').where('id', id).first();
+        const rental = await db('data').where('id', id).first();
         if (!rental) return res.status(404).json({ error: true, message: 'Rental not found' });
 
-        const existing = await db('ratings').where({ user_id: user.id, rental_id: id }).first();
+        const existing = await db('ratings').where({ userId: user.id, rentalId: id }).first();
 
         const now = new Date();
         if (existing) {
             // Update
-            await db('ratings').where({ user_id: user.id, rental_id: id }).update({
+            await db('ratings').where({ userId: user.id, rentalId: id }).update({
                 rating: ratingNum,
                 comment: comment ?? null,
-                updated_at: now,
+                createdAt: now,
             });
         } else {
             // Insert
             await db('ratings').insert({
-                user_id: user.id,
-                rental_id: id,
+                userId: user.id,
+                rentalId: id,
                 rating: ratingNum,
                 comment: comment ?? null,
-                created_at: now,
-                updated_at: now,
+                createdAt: now,
             });
         }
 

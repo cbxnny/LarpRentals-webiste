@@ -32,7 +32,7 @@ router.post('/register', async (req, res) => {
         const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
         await db('users').insert({
             email,
-            password: passwordHash,
+            passwordHash,
             firstName: null,
             lastName: null,
             dob: null,
@@ -60,7 +60,7 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ error: true, message: 'Incorrect email or password.' });
         }
 
-        const match = await bcrypt.compare(password, user.password);
+        const match = await bcrypt.compare(password, user.passwordHash);
         if (!match) {
             return res.status(401).json({ error: true, message: 'Incorrect email or password.' });
         }
@@ -87,7 +87,7 @@ router.post('/debugLogin', async (req, res) => {
             return res.status(401).json({ error: true, message: 'Incorrect email or password.' });
         }
 
-        const match = await bcrypt.compare(password, user.password);
+        const match = await bcrypt.compare(password, user.passwordHash);
         if (!match) {
             return res.status(401).json({ error: true, message: 'Incorrect email or password.' });
         }
