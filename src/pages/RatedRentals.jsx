@@ -28,7 +28,7 @@ export default function RatedRentals() {
   const [enriching, setEnriching] = useState(false);
   const [error, setError] = useState('');
 
-  // FIX: defined with useCallback so it can be listed as a dep without causing infinite loops
+
   const fetchPage = useCallback(async (p) => {
     setLoading(true);
     setError('');
