@@ -182,7 +182,7 @@ router.put('/:email/profile', requireAuth, async (req, res) => {
         return res.status(400).json({ error: true, message: 'Invalid input: dob must be a real date in format YYYY-MM-DD.' });
     }
     if (!isPastDateString(dob)) {
-        return res.status(400).json({ error: true, message: 'Invalid input: dob must be a date in the past.' });
+        return res.status(400).json({ error: true, message: 'Invalid input, dob must be a date in the past.' });
     }
 
     try {

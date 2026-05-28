@@ -71,15 +71,14 @@ router.get('/rentals/:id', requireAuth, async (req, res) => {
         if (!user) return res.status(404).json({ error: true, message: 'User not found' });
 
         const rental = await db('data').where('id', id).first();
-        if (!rental) return res.status(404).json({ error: true, message: 'Rental not found' });
+        if (!rental) return res.status(404).json({ error: true, message: 'No rental exists with this ID.' });
 
         const existing = await db('ratings')
             .where({ userId: user.id, rentalId: id })
             .first();
 
         if (!existing) {
-            // No rating yet — return empty object
-            return res.json({});
+            return res.status(404).json({ error: true, message: 'No rating exists with this rental ID.' });
         }
 
         res.json({
@@ -122,7 +121,7 @@ router.post('/rentals/:id', requireAuth, async (req, res) => {
         if (!user) return res.status(404).json({ error: true, message: 'User not found' });
 
         const rental = await db('data').where('id', id).first();
-        if (!rental) return res.status(404).json({ error: true, message: 'Rental not found' });
+        if (!rental) return res.status(404).json({ error: true, message: 'No rental exists with this ID.' });
 
         const existing = await db('ratings').where({ userId: user.id, rentalId: id }).first();
 
@@ -145,10 +144,10 @@ router.post('/rentals/:id', requireAuth, async (req, res) => {
             });
         }
 
-        res.json({
-            message: existing ? 'Rating updated successfully.' : 'Rating added successfully.',
+        res.status(201).json({
             rating: ratingNum,
             ...(comment ? { comment } : {}),
+            dateTime: now.toISOString(),
         });
     } catch (err) {
         console.error(err);

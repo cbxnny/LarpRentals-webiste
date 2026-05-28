@@ -3,6 +3,10 @@ const router = express.Router();
 const db = require('../middleware/db');
 
 router.get('/states', async (req, res) => {
+    if (Object.keys(req.query).length > 0) {
+        const params = Object.keys(req.query).join(', ');
+        return res.status(400).json({ error: true, message: `Invalid query parameters: ${params}. Query parameters are not permitted.` });
+    }
     try {
         const rows = await db('data').distinct('state').orderBy('state');
         res.json(rows.map(r => r.state).filter(Boolean));
@@ -13,6 +17,10 @@ router.get('/states', async (req, res) => {
 });
 
 router.get('/property-types', async (req, res) => {
+    if (Object.keys(req.query).length > 0) {
+        const params = Object.keys(req.query).join(', ');
+        return res.status(400).json({ error: true, message: `Invalid query parameters: ${params}. Query parameters are not permitted.` });
+    }
     try {
         const rows = await db('data').distinct('propertyType').orderBy('propertyType');
         res.json(rows.map(r => r.propertyType).filter(Boolean));
@@ -33,23 +41,45 @@ router.get('/search', async (req, res) => {
             sortBy, page = 1,
         } = req.query;
 
-        // Accept both sortOrder (spec) and sortDir (React app) for compatibility
-        const sortOrder = req.query.sortOrder || req.query.sortDir || 'asc';
+        if (req.query.sortOrder && !sortBy) {
+            return res.status(400).json({ error: true, message: "Invalid sortOrder parameter. sortBy must be specified." });
+        }
+        if (req.query.sortOrder && !['asc', 'desc'].includes(req.query.sortOrder)) {
+            return res.status(400).json({ error: true, message: "Invalid sortOrder parameter. Must be 'asc' or 'desc'." });
+        }
 
+        const sortOrder = req.query.sortOrder || req.query.sortDir || 'asc';
         const allowedSortBy = ['id', 'title', 'rent', 'propertyType', 'latitude', 'longitude', 'postcode', 'state', 'suburb', 'bathrooms', 'bedrooms', 'parkingSpaces', 'averageRating', 'numRatings'];
 
         if (sortBy && !allowedSortBy.includes(sortBy)) {
             return res.status(400).json({ error: true, message: 'Invalid sortBy parameter. Must refer to a valid sortable property.' });
         }
-        if (!['asc', 'desc'].includes(sortOrder)) {
-            return res.status(400).json({ error: true, message: "Invalid sortOrder parameter. Must be 'asc' or 'desc'." });
+
+        if (postcode !== undefined) {
+            const p = Number(postcode);
+            if (!Number.isInteger(p) || p < 0 || p > 9999) {
+                return res.status(400).json({ error: true, message: 'Invalid postcode parameter. Must be an integer in the range of 0000-9999.' });
+            }
+        }
+
+        const nonNegativeIntegerParams = ['minimumRent', 'maximumRent', 'minimumBathrooms', 'maximumBathrooms', 'minimumBedrooms', 'maximumBedrooms', 'minimumParking', 'maximumParking'];
+        for (const p of nonNegativeIntegerParams) {
+            if (req.query[p] !== undefined) {
+                const val = Number(req.query[p]);
+                if (!Number.isInteger(val) || val < 0) {
+                    return res.status(400).json({ error: true, message: `Invalid ${p} parameter. Must be a non-negative integer.` });
+                }
+            }
+        }
+
+        if (page !== undefined) {
+            const p = Number(page);
+            if (!Number.isInteger(p) || p < 1) {
+                return res.status(400).json({ error: true, message: 'Invalid page parameter. Must be an integer greater than or equal to 1.' });
+            }
         }
 
         const pageNum = parseInt(page, 10) || 1;
-        if (pageNum < 1) {
-            return res.status(400).json({ error: true, message: 'Invalid page parameter. Must be an integer greater than or equal to 1.' });
-        }
-
         const perPage = 10;
         const offset = (pageNum - 1) * perPage;
 
@@ -91,6 +121,8 @@ router.get('/search', async (req, res) => {
         res.json({
             data: rows.map(r => ({
                 ...r,
+                latitude: parseFloat(r.latitude),
+                longitude: parseFloat(r.longitude),
                 averageRating: r.averageRating ? parseFloat(Number(r.averageRating).toFixed(2)) : null,
                 numRatings: parseInt(r.numRatings, 10),
             })),
@@ -109,6 +141,10 @@ router.get('/search', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
+    if (Object.keys(req.query).length > 0) {
+        const params = Object.keys(req.query).join(', ');
+        return res.status(400).json({ error: true, message: `Invalid query parameters: ${params}. Query parameters are not permitted.` });
+    }
     try {
         const { id } = req.params;
         if (isNaN(id)) return res.status(400).json({ error: true, message: 'Invalid rental ID' });
@@ -131,8 +167,8 @@ router.get('/:id', async (req, res) => {
             description: rental.description,
             propertyType: rental.propertyType,
             locality: rental.locality,
-            latitude: rental.latitude,
-            longitude: rental.longitude,
+            latitude: parseFloat(rental.latitude),
+            longitude: parseFloat(rental.longitude),
             postcode: rental.postcode,
             state: rental.state,
             streetAddress: rental.streetAddress,

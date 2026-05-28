@@ -71,7 +71,7 @@ export default function RatedRentals() {
     setEnriching(false);
   }, []);
 
-  // FIX: include fetchPage and enrichRatings in deps — both are stable useCallback references
+
   useEffect(() => {
     if (!token) { navigate('/login'); return; }
     fetchPage(page).then(enrichRatings);
@@ -140,7 +140,7 @@ export default function RatedRentals() {
                       const r = item.rental;
                       const rating = item.rating ?? item.userRating ?? item.stars;
                       const ratedAt = item.createdAt ?? item.rated_at ?? item.timestamp ?? item.date ?? item.dateTime;
-                      // NEW: comment field from A3 API
+
                       const reviewComment = item.comment ?? null;
 
                       return (

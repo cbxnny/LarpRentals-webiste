@@ -52,7 +52,7 @@ function StatBox({ icon, value, label, color }) {
   );
 }
 
-// NEW: Renders the reviews list from the A3 API reviews[] field
+
 function ReviewsList({ reviews }) {
   if (!reviews || reviews.length === 0) return (
     <p className="text-muted small mb-0 fst-italic">No written reviews yet.</p>
@@ -171,7 +171,7 @@ export default function RentalDetail() {
     }
   };
 
-  // FIX: share button with fallback for non-HTTPS / no clipboard API
+
   const handleShare = () => {
     const url = window.location.href;
     if (navigator.clipboard) {
