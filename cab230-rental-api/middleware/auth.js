@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-// ── Helpers ───────────────────────────────────────────────────
+// ── Helpers 
 function extractToken(req) {
     const header = req.headers['authorization'];
     if (!header) return { token: null, error: null }; // no header at all
@@ -38,7 +38,7 @@ function requireAuth(req, res, next) {
     next();
 }
 
-// ── Middleware: optional auth — attaches user if token present, else continues ──
+// ── Middleware: 
 function optionalAuth(req, res, next) {
     const { token, error: extractError } = extractToken(req);
 

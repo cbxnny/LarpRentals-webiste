@@ -30,6 +30,8 @@ router.get('/property-types', async (req, res) => {
     }
 });
 
+//get search
+
 router.get('/search', async (req, res) => {
     try {
         const {
@@ -86,7 +88,7 @@ router.get('/search', async (req, res) => {
         let query = db('data');
 
         if (state) query = query.where('state', state);
-        if (suburb) query = query.whereIlike('suburb', `%${suburb}%`);
+        if (suburb) query = query.where('suburb', 'like', `%${suburb}%`);
         if (postcode) query = query.where('postcode', postcode);
         if (propertyTypes) {
             const types = Array.isArray(propertyTypes) ? propertyTypes : propertyTypes.split(',');
@@ -140,6 +142,8 @@ router.get('/search', async (req, res) => {
     }
 });
 
+
+// get id
 router.get('/:id', async (req, res) => {
     if (Object.keys(req.query).length > 0) {
         const params = Object.keys(req.query).join(', ');
